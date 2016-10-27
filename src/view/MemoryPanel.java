@@ -23,7 +23,7 @@ public class MemoryPanel extends JPanel{
 		int strH = fm.getHeight();
 		for(int i = 0; i < memoryCells.length; i++){
 			g.drawRect(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), 
-					(int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING)), 
+					(int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.PANEL_DRAW_UP_PAD, 
 					View.MEM_CELL_WIDTH, View.MEM_CELL_HEIGHT);
 			if(i == RMPanel.lastCell){
 				g.setFont(g.getFont().deriveFont(Font.BOLD));
@@ -31,7 +31,7 @@ public class MemoryPanel extends JPanel{
 			}
 			int strW = fm.stringWidth(""+memoryCells[i]);
 			g.drawString(""+memoryCells[i], View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT)+View.MEM_CELL_WIDTH/2-strW/2, 
-					(int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING)+(View.MEM_CELL_HEIGHT/2)+(strH/2)+View.FONT_VERT_OFF));
+					(int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING)+(View.MEM_CELL_HEIGHT/2)+(strH/2)+View.FONT_VERT_OFF)+View.PANEL_DRAW_UP_PAD);
 			if(i == RMPanel.lastCell){
 				g.setFont(g.getFont().deriveFont(Font.PLAIN));
 				fm = g.getFontMetrics();
@@ -41,6 +41,6 @@ public class MemoryPanel extends JPanel{
 	
 	public Point getRelativeCellLoc(int cellIndex){
 		return new Point(View.MEM_CELL_WIDTH*(cellIndex%View.MEM_CELL_COL_COUNT)+View.MEM_CELL_WIDTH/2,
-				(int) (Math.floor(cellIndex/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING)+View.MEM_CELL_HEIGHT/2));
+				(int) (Math.floor(cellIndex/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING)+View.MEM_CELL_HEIGHT/2)+View.PANEL_DRAW_UP_PAD);
 	}
 }

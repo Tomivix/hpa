@@ -6,6 +6,7 @@ import javax.swing.SpringLayout;
 import static javax.swing.SpringLayout.*;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -41,7 +42,7 @@ public class RMPanel extends JPanel {
 
 	public void setRegisters(int[] registers) {
 		registerPanel.setRegisters(registers);
-		layout.putConstraint(SOUTH, registerPanel, registers.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING), NORTH, registerPanel);
+		layout.putConstraint(SOUTH, registerPanel, registers.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
 	
@@ -58,24 +59,30 @@ public class RMPanel extends JPanel {
 		case View.RR:
 			p1 = registerPanel.getRelativeRegisterLoc(lastReg1);
 			p1.y += View.REGISTER_HEIGHT/2;
+			p2 = new Point(p1.x, p1.y+View.REGISTER_VERT_PADDING/2);
 			p6 = registerPanel.getRelativeRegisterLoc(lastReg2);
 			p6.y -= View.REGISTER_HEIGHT/2;
+			p5 = new Point(p6.x, p6.y-View.REGISTER_VERT_PADDING/2);
 			break;
 		case View.RM:
 			p1 = registerPanel.getRelativeRegisterLoc(lastReg1);
 			p1.y += View.REGISTER_HEIGHT/2;
+			p2 = new Point(p1.x, p1.y+View.REGISTER_VERT_PADDING/2);
 			p6 = memoryPanel.getRelativeCellLoc(lastCell);
 			memCellOffset = layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD;
 			p6.x += memCellOffset;
 			p6.y -= View.MEM_CELL_HEIGHT/2;
+			p5 = new Point(p6.x, p6.y-View.MEM_CELL_VERT_PADDING/2);
 			break;
 		case View.MR:
 			p1 = memoryPanel.getRelativeCellLoc(lastCell);
 			memCellOffset = layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD;
 			p1.x += memCellOffset;
 			p1.y += View.MEM_CELL_HEIGHT/2;
+			p2 = new Point(p1.x, p1.y+View.MEM_CELL_VERT_PADDING/2);
 			p6 = registerPanel.getRelativeRegisterLoc(lastReg1);
 			p6.y -= View.REGISTER_HEIGHT/2;
+			p5 = new Point(p6.x, p6.y-View.REGISTER_VERT_PADDING/2);
 			break;
 		case -1:
 			break;
@@ -85,49 +92,32 @@ public class RMPanel extends JPanel {
 		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.REGISTER_WIDTH));
 		
 		if (p1 != null && p6 != null) {
-			drawArrow(p6, p1.x == p6.x ? (p6.y > p1.y ? UP : DOWN) : p6.x > p1.x ? RIGHT : LEFT, g);
+			Point p3 = new Point(layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD/2, p2.y);
+			Point p4 = new Point(p3.x, p5.y);
 			Graphics2D g2 = (Graphics2D) g;
 			g2.setStroke(new BasicStroke(2));
-			Point p2 = new Point(p1.x, p1.y);
-			g2.draw(new Line2D.Float(p1, p6));
-			g2.draw(new Line2D.Float(p1.x, p6.y, p6.x, p6.y));
-			//g.setColor(Color.BLACK);
+			
+			g2.draw(new Line2D.Float(p1, p2));
+			g2.draw(new Line2D.Float(p2, p3));
+			g2.draw(new Line2D.Float(p3, p4));
+			g2.draw(new Line2D.Float(p4, p5));
+			drawArrow(p6, g);
 		}
 		
 	}
 	
-	public void drawArrow(Point p, byte dir, Graphics g){
+	public void drawArrow(Point p, Graphics g){
 		int[] xP = new int[3];
 		int[] yP = new int[3];
 		xP[0] = p.x;
 		yP[0] = p.y;
-		switch(dir){
-		case UP:
-			xP[1] = p.x-View.ARROW_WIDTH;
-			yP[1] = p.y-View.ARROW_LENGTH;
-			xP[2] = p.x+View.ARROW_WIDTH;
-			yP[2] = p.y-View.ARROW_LENGTH;
-			break;
-		case RIGHT:
-			xP[1] = p.x-View.ARROW_LENGTH;
-			yP[1] = p.y+View.ARROW_WIDTH;
-			xP[2] = p.x-View.ARROW_LENGTH;
-			yP[2] = p.y-View.ARROW_WIDTH;
-			break;
-		case DOWN:
-			xP[1] = p.x-View.ARROW_WIDTH;
-			yP[1] = p.y+View.ARROW_LENGTH;
-			xP[2] = p.x+View.ARROW_WIDTH;
-			yP[2] = p.y+View.ARROW_LENGTH;
-			break;
-		case LEFT:
-			xP[1] = p.x+View.ARROW_LENGTH;
-			yP[1] = p.y+View.ARROW_WIDTH;
-			xP[2] = p.x+View.ARROW_LENGTH;
-			yP[2] = p.y-View.ARROW_WIDTH;
-			break;
-		}
+		xP[1] = p.x-View.ARROW_WIDTH;
+		yP[1] = p.y-View.ARROW_LENGTH;
+		xP[2] = p.x+View.ARROW_WIDTH;
+		yP[2] = p.y-View.ARROW_LENGTH;
+//		g.setColor(Color.red);
 		g.fillPolygon(xP, yP, 3);
+		g.setColor(Color.black);
 	}
 	
 	public void updateValues(int source, int dest, byte mode){
