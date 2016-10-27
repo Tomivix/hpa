@@ -1,12 +1,13 @@
-package view;
+package view.reg_mem;
 
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import view.View;
+
 import static javax.swing.SpringLayout.*;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -14,7 +15,6 @@ import java.awt.geom.Line2D;
 
 public class RMPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private final byte UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3;
 
 	private SpringLayout layout;
 	private RegisterPanel registerPanel;
@@ -87,8 +87,6 @@ public class RMPanel extends JPanel {
 		case -1:
 			break;
 		}
-		
-		//g.setColor(Color.LIGHT_GRAY);
 		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.REGISTER_WIDTH));
 		
 		if (p1 != null && p6 != null) {
@@ -115,9 +113,7 @@ public class RMPanel extends JPanel {
 		yP[1] = p.y-View.ARROW_LENGTH;
 		xP[2] = p.x+View.ARROW_WIDTH;
 		yP[2] = p.y-View.ARROW_LENGTH;
-//		g.setColor(Color.red);
 		g.fillPolygon(xP, yP, 3);
-		g.setColor(Color.black);
 	}
 	
 	public void updateValues(int source, int dest, byte mode){

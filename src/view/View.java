@@ -2,6 +2,10 @@ package view;
 
 import javax.swing.JFrame;
 import javax.swing.SpringLayout;
+
+import view.code.CodePanel;
+import view.reg_mem.RMPanel;
+
 import java.awt.Dimension;
 
 import static javax.swing.SpringLayout.*;

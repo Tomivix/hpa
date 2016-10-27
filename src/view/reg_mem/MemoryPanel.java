@@ -1,4 +1,4 @@
-package view;
+package view.reg_mem;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.JPanel;
+
+import view.View;
 
 public class MemoryPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
