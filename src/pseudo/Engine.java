@@ -165,7 +165,6 @@ public class Engine {
 			public void execute(int arg1, int arg2){
 				int reg = getReg(arg2);
 				setReg(arg1, reg);
-				//setFlag(reg);	does load change flag?
 			}
 		});
 		
@@ -216,7 +215,6 @@ public class Engine {
 			public void execute(int arg1, int arg2){
 				int reg = getVar(arg2);
 				setReg(arg1, reg);
-				//setFlag(reg);	does load change flag?
 			}
 		});
 		
@@ -224,7 +222,6 @@ public class Engine {
 			public void execute(int arg1, int arg2){
 				int reg = arg2;
 				setReg(arg1, reg);
-				//setFlag(reg);	does load change flag?
 			}
 		});
 		
@@ -232,7 +229,6 @@ public class Engine {
 			public void execute(int arg1, int arg2){
 				int reg = getReg(arg1);
 				setVar(arg2, reg);
-				//setFlag(reg);	does store change flag?
 			}
 		});
 		
