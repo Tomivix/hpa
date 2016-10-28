@@ -25,7 +25,7 @@ public class TitlePanel extends JPanel {
 		super.add(label);
 		layout.putConstraint(NORTH, label, 0, NORTH, this);
 		layout.putConstraint(SOUTH, label, 0, SOUTH, this);
-		layout.putConstraint(WEST, label, 0, WEST, this);
+		layout.putConstraint(WEST, label, 5, WEST, this);
 		layout.putConstraint(EAST, label, 100, WEST, label);
 		selectAllButton = new JButton("Select all");
 		selectAllButton.addActionListener(new ActionListener() {

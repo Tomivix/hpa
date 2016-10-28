@@ -40,14 +40,14 @@ public class RMPanel extends JPanel {
 	}
 
 
-	public void setRegisters(int[] registers) {
-		registerPanel.setRegisters(registers);
-		layout.putConstraint(SOUTH, registerPanel, registers.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD, NORTH, registerPanel);
+	public void setRegisters() {
+		registerPanel.setRegisters();
+		layout.putConstraint(SOUTH, registerPanel, View.registers.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT+View.LABEL_DOWN_PAD, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
 	
-	public void setMemoryCells(int[] cells){
-		memoryPanel.setMemoryCells(cells);
+	public void setMemoryCells(){
+		memoryPanel.setMemoryCells();
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class RMPanel extends JPanel {
 		case -1:
 			break;
 		}
-		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.REGISTER_WIDTH));
+		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.MEM_CELL_WIDTH));
 		
 		if (p1 != null && p6 != null) {
 			Point p3 = new Point(layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD/2, p2.y);
@@ -101,7 +101,6 @@ public class RMPanel extends JPanel {
 			g2.draw(new Line2D.Float(p4, p5));
 			drawArrow(p6, g);
 		}
-		
 	}
 	
 	public void drawArrow(Point p, Graphics g){
