@@ -10,7 +10,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 	@Override
 	public void insertString(int offset, String str, AttributeSet a){
 		try {
-			super.insertString(offset, str, a);
+			super.insertString(offset, str.toUpperCase(), a);
 			recalculateStyles();
 		} catch (BadLocationException e) {
 			e.printStackTrace();
