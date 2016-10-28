@@ -16,7 +16,7 @@ public class OrderStyledDocument extends ColorStyledDocument {
 	public OrderStyledDocument() {
 		super();
 		StyleContext cont = StyleContext.getDefaultStyleContext();
-		defStyle = cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Times New Roman"), StyleConstants.FontSize, 18);
+		defStyle = cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18);
 		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Italic, true), StyleConstants.Foreground, Color.ORANGE);
 		dirStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.CYAN);
 	}

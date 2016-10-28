@@ -4,7 +4,6 @@ import javax.swing.JFrame;
 import javax.swing.SpringLayout;
 
 import view.code.CodePanel;
-import view.reg_mem.MemoryPanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
@@ -16,11 +15,11 @@ public class View {
 	
 	public static View Instance;
 	
-	public final static int FRAME_WIDTH = 1050, FRAME_HEIGHT = 700;
-	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 150, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
-	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 25, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
+	public final static int FRAME_WIDTH = 1050, FRAME_HEIGHT = 730;
+	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
+	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public final static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
-	public final static int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 20, MEM_CELL_VERT_PADDING = 10;
+	public final static int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public final static int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	
 	public static int MEM_CELL_COL_COUNT = 2;
