@@ -56,11 +56,10 @@ public class Engine {
 		mathOps = new String[]{"A","S","M","D","C"};  //new code
 
 		regs = new int[16];
-		for(int reg : regs) reg = 0;
-		
-		lastVar = 0;
-		currentOrder = 0;
-		lastOrder = 0;
+		// for(int reg : regs) reg = 0;  <-- registers should start with random value
+		regs[14] = lastVar = 1024;
+		regs[15] = lastOrder = currentOrder = 2048;
+
 		flag = ERROR;
 		
 		createFunctions();
@@ -334,14 +333,35 @@ public class Engine {
 	// checks if the raw command provided by user has correct HPA-compliant syntax
 	// returns true only if the command has valid syntax (can possibly be executed)
 	// this method (so far) doesn't check if specified memory cells were declared!
-	public boolean parse(String line) {
-		if(
-			line.matches("([A-Z0-9]+\\s:\\s|^)(AR|SR|MR|DR|CR|LR)\\s[0-9]{1,2},[0-9]{1,2}") ||
-			line.matches("([A-Z0-9]+\\s:\\s|^)(A|S|M|D|C|L|LA|ST)\\s[0-9]{1,2},[A-Z0-9]+") ||
-			line.matches("([A-Z0-9]+\\s:\\s|^)(J|JN|JP|JZ)\\s[A-Z0-9]+") ||
-			line.matches("[A-Z0-9]+\\s:\\s(DC|DS)\\s([0-9]+\\*|)INT\\([0-9]+\\)")
-		) return true;
-		else return false;
+	// previous label checking regex ([A-Z0-9]+ : |^)
+	public int parse(String line) {
+		int type = 0;
+		type = (line.matches("([A-Z][A-Z0-9]* : |^)(AR|SR|MR|DR|CR|LR) [0-9]+,[0-9]+")) ? 1 : type;
+		type = (line.matches("([A-Z][A-Z0-9]* : |^)(A|S|M|D|C|L|LA|ST) [0-9]+,([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 2 : type;
+		type = (line.matches("([A-Z][A-Z0-9]* : |^)(J|JN|JP|JZ) ([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 3 : type;
+		type = (line.matches("[A-Z][A-Z0-9]* : DC ([0-9]+\\*|)(INTEGER|INT)\\(-?[0-9]+\\)")) ? 4 : type;
+		type = (line.matches("[A-Z][A-Z0-9]* : DS ([0-9]+\\*|)(INTEGER|INT)")) ? 5 : type;
+		return type;
+	}
+	
+	// method getPos takes string line returns array containg start.end index of each part
+	public int[][] getPos(String line) {
+		int temp = 0; int res[][] = new int[4][2];
+		if((temp = line.indexOf(" : ") + 1) != 0) {
+			res[0][0] = 0; res[0][1] = temp - 2;
+			line = line.substring(++temp);
+		}
+		res[1][0] = temp;
+		return res;
+	}
+	
+	public boolean split(String line) {
+		String[] res = new String[4];
+		int temp;
+		if((temp = line.indexOf(" : ")) != -1) {
+			res[0] = line.substring(0,--temp) + "";
+		}
+		return true;
 	}
 	
 	// dummy main method, remove if no longer needed
@@ -351,7 +371,9 @@ public class Engine {
 		Engine.setReg(2, 17);
 		Engine.functions.get("AR").execute(1, 2);
 		//System.out.println(Engine.getReg(1));
-		System.out.println(Engine.parse("A : DC 1*INT(100)"));
+		System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
+		String a = "abc : def";
+		System.out.println(a.indexOf(" : "));
 	}
 
 }
