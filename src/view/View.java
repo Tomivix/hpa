@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.SpringLayout;
 
 import view.code.CodePanel;
+import view.reg_mem.MemoryPanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
@@ -15,19 +16,19 @@ public class View {
 	
 	public static View Instance;
 	
-	public final static int FRAME_WIDTH = 800, FRAME_HEIGHT = 600;
-	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 150;
-	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 20, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
+	public final static int FRAME_WIDTH = 1050, FRAME_HEIGHT = 700;
+	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 150, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
+	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 25, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public final static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
-	public final static int MEM_CELL_WIDTH = 90, MEM_CELL_HEIGHT = 20, MEM_CELL_VERT_PADDING = 10;
+	public final static int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 20, MEM_CELL_VERT_PADDING = 10;
 	public final static int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	
-	public static int MEM_CELL_COL_COUNT = 3;
+	public static int MEM_CELL_COL_COUNT = 2;
 	
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
-	private int[] registers, memoryCells;
+	public static int[] registers, memoryCells; //FIXME: Placholder, will be replaced with Engine getters
 	private SpringLayout layout;
 	public View(){
 		Instance = this;
@@ -56,20 +57,20 @@ public class View {
 		frame.setLocationRelativeTo(null);
 	}
 	
-	public void setRegisters(int[] registers){
-		this.registers = new int[registers.length];
-		for(int i = 0; i < registers.length; i++){
-			this.registers[i] = registers[i];
+	public void setRegisters(int[] regs){
+		registers = new int[regs.length];
+		for(int i = 0; i < regs.length; i++){
+			registers[i] = regs[i];
 		}
-		rmPanel.setRegisters(this.registers);
+		rmPanel.setRegisters();
 	}
 	
 	public void setMemoryCells(int[] cells){
-		this.memoryCells = new int[cells.length];
+		memoryCells = new int[cells.length];
 		for(int i = 0; i < cells.length; i++){
-			this.memoryCells[i] = cells[i];
+			memoryCells[i] = cells[i];
 		}
-		rmPanel.setMemoryCells(this.memoryCells);
+		rmPanel.setMemoryCells();
 	}
 	
 	public void updateValues(int reg, int source, byte mode){

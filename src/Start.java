@@ -16,7 +16,7 @@ public class Start{
 				v.setMemoryCells(new int[]{
 						1, 124, 57, -1245, 12, 335, 3251, 436, 26, -141
 				});
-				v.updateValues(15, 4, View.RM);
+				v.updateValues(10, 4, View.RM);
 			}
 		});
 	}
