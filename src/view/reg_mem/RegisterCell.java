@@ -23,4 +23,11 @@ public class RegisterCell extends EditableCell {
 		return index+":";
 	}
 
+	@Override
+	protected boolean isLastEdited() {
+		return index == RMPanel.lastReg1 || index == RMPanel.lastReg2;
+	}
+	
+	
+
 }

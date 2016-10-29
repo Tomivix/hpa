@@ -11,9 +11,11 @@ import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.Line2D;
 
-public class RMPanel extends JPanel {
+public class RMPanel extends JPanel implements ComponentListener {
 	private static final long serialVersionUID = 1L;
 
 	private SpringLayout layout;
@@ -25,6 +27,7 @@ public class RMPanel extends JPanel {
 	public RMPanel(){
 		super();
 		super.setLayout(layout = new SpringLayout());
+		super.addComponentListener(this);
 		
 		registerPanel = new RegisterPanel();
 		layout.putConstraint(WEST, registerPanel, 0, WEST, this);
@@ -51,7 +54,7 @@ public class RMPanel extends JPanel {
 	}
 	
 	@Override
-	public void paint(Graphics g){ //TODO: Recalculate line with every repaint
+	public void paint(Graphics g){
 		super.paint(g);
 		
 		int memCellOffset;
@@ -87,7 +90,6 @@ public class RMPanel extends JPanel {
 		case -1:
 			break;
 		}
-		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.MEM_CELL_WIDTH));
 		
 		if (p1 != null && p6 != null) {
 			Point p3 = new Point(layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD/2, p2.y);
@@ -117,25 +119,68 @@ public class RMPanel extends JPanel {
 	
 	public void updateValues(int source, int dest, byte mode){
 		lastOrderMode = mode;
+		int lr1 = lastReg1, lr2 = lastReg2, lc = lastCell;
 		switch(mode){
 		case View.RR:
 			lastReg1 = source;
 			lastReg2 = dest;
 			lastCell = -1;
+			registerPanel.updateRegisters(source);
+			registerPanel.updateRegisters(dest);
 			break;
 		case View.RM:
 			lastReg1 = source;
 			lastReg2 = -1;
 			lastCell = dest;
+			registerPanel.updateRegisters(source);
+			memoryPanel.updateCell(dest);
 			break;
 		case View.MR:
 			lastReg1 = dest;
 			lastReg2 = -1;
 			lastCell = source;
+			memoryPanel.updateCell(source);
+			registerPanel.updateRegisters(dest);
 			break;
 		default:
 			lastOrderMode = -1;
 		}
-		
+		if (lr1 != -1)
+			registerPanel.updateRegisters(lr1);
+		if (lr2 != -1)
+			registerPanel.updateRegisters(lr2);
+		if (lc != -1)
+			memoryPanel.updateCell(lc);
+	}
+
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
+	}
+
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+	}
+
+
+	@Override
+	public void componentResized(ComponentEvent e) {
+		recalculateCells();
+	}
+
+
+	@Override
+	public void componentShown(ComponentEvent e) {
+		recalculateCells();
+	}
+	
+	private void recalculateCells(){
+		if(layout.getConstraints(memoryPanel).getWidth().getValue() <= 0){
+			return;
+		}
+		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.MEM_CELL_WIDTH));
+		memoryPanel.recalculateCellsPosition();
+		repaint();
 	}
 }

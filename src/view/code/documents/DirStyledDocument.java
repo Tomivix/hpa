@@ -8,17 +8,20 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import placeholder.Placeholder;
+import view.code.NumHeader;
 
 public class DirStyledDocument extends ColorStyledDocument {
 	private static final long serialVersionUID = 1L;
 	
 	private AttributeSet defStyle, labelStyle, dirStyle;
-	public DirStyledDocument() {
-		super();
+	public DirStyledDocument(NumHeader numHeader) {
+		super(numHeader);
 		StyleContext cont = StyleContext.getDefaultStyleContext();
 		defStyle = cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18);
 		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.RED);
 		dirStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.BLUE);
+		dFont = cont.getFont(defStyle);
+		numHeader.updateHeader(dFont);
 	}
 	
 	public void recalculateStyles(){

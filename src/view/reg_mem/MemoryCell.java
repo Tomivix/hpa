@@ -32,4 +32,9 @@ public class MemoryCell extends EditableCell {
 		this.topY = newY;
 	}
 
+	@Override
+	protected boolean isLastEdited() {
+		return index == RMPanel.lastCell;
+	}
+
 }
