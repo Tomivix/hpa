@@ -22,7 +22,7 @@ public class View {
 	public final static int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public final static int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	
-	public static int MEM_CELL_COL_COUNT = 2;
+	public static int MEM_CELL_COL_COUNT = 5;
 	
 	private JFrame frame;
 	private CodePanel codePanel;

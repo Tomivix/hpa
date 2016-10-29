@@ -17,13 +17,15 @@ public class CodePanel extends JPanel{
 	public CodePanel(){
 		super();
 		super.setLayout(new GridLayout(1, 0));
-		DirStyledDocument dirSDoc = new DirStyledDocument();
+		NumHeader dirNumHeader = new NumHeader();
+		DirStyledDocument dirSDoc = new DirStyledDocument(dirNumHeader);
 		dirPane = new JTextPane(dirSDoc);
-		CodeArea dirArea = new CodeArea("Directives:", dirPane);
+		CodeArea dirArea = new CodeArea("Directives:", dirPane, dirNumHeader);
 		
-		OrderStyledDocument orderSDoc = new OrderStyledDocument();
+		NumHeader orderNumHeader = new NumHeader();
+		OrderStyledDocument orderSDoc = new OrderStyledDocument(orderNumHeader);
 		ordersPane = new JTextPane(orderSDoc);
-		CodeArea orderArea = new CodeArea("Orders:", ordersPane);
+		CodeArea orderArea = new CodeArea("Orders:", ordersPane, orderNumHeader);
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, dirArea, orderArea);
 		splitPane.setDividerLocation(View.DEFAULT_DIR_PANE_HEIGHT);

@@ -1,6 +1,7 @@
 package view.reg_mem;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 
 import javax.swing.BorderFactory;
@@ -44,10 +45,16 @@ public abstract class EditableCell extends JPanel {
 	
 	public void updateValue(){
 		value.setText(""+getValue());
+		if(isLastEdited()){
+			value.setFont(value.getFont().deriveFont(Font.BOLD, 18));
+		}else{
+			value.setFont(value.getFont().deriveFont(Font.PLAIN, 12));
+		}
 	}
 	
 	protected abstract int getValue();
 	protected abstract String getLabel();
+	protected abstract boolean isLastEdited();
 	
 	public int getTopX(){
 		return topX;

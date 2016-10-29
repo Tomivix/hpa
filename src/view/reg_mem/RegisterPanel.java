@@ -48,4 +48,7 @@ public class RegisterPanel extends JPanel {
 		return new Point(registerCells[regIndex].getTopX()+View.REGISTER_WIDTH/2, registerCells[regIndex].getTopY()+View.REGISTER_HEIGHT/2);
 	}
 
+	public void updateRegisters(int iReg){
+		registerCells[iReg].updateValue();
+	}
 }

@@ -1,6 +1,5 @@
 package view.reg_mem;
 
-import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.BorderFactory;
@@ -12,7 +11,7 @@ import view.View;
 
 import static javax.swing.SpringLayout.*;
 
-public class MemoryPanel extends JPanel {
+public class MemoryPanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private SpringLayout layout;
@@ -49,9 +48,7 @@ public class MemoryPanel extends JPanel {
 		return new Point(memoryCells[regIndex].getTopX()+View.MEM_CELL_WIDTH/2, memoryCells[regIndex].getTopY()+View.MEM_CELL_HEIGHT/2);
 	}
 	
-	@Override
-	public void paint(Graphics g){
-		super.paint(g);
+	public void recalculateCellsPosition(){
 		for(int i = 0; i < View.memoryCells.length; i++){
 			MemoryCell memCell = memoryCells[i];
 			memCell.setTopX(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT));
@@ -61,6 +58,10 @@ public class MemoryPanel extends JPanel {
 			layout.putConstraint(NORTH, memCell, memCell.getTopY(), NORTH, this);
 			layout.putConstraint(SOUTH, memCell, View.MEM_CELL_HEIGHT, NORTH, memCell);
 		}
+		super.doLayout();
 	}
-
+	
+	public void updateCell(int iCell){
+		memoryCells[iCell].updateValue();
+	}
 }
