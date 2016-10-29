@@ -1,5 +1,8 @@
 package pseudo;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -311,13 +314,11 @@ public class Engine {
 				temp.get(3).add(last); temp.get(3).add(line.length());
 			} else {
 				int[][] res = this.getPos(line);
-				temp.get(0).add(res[1][0] + last);
-				temp.get(0).add(res[1][1] - res[1][0] + 1 + last);
 				for(int i = 0; i < 4; i++) {
 					if(!Arrays.equals(res[i], new int[]{-1,-1})) {
 						int j = (i == 3) ? 2 : i;
 						temp.get(j).add(res[i][0] + last);
-						temp.get(j).add(res[i][1] - res[i][0] + 1 + last);
+						temp.get(j).add(res[i][1] - res[i][0] + 1);
 					}
 				}
 			} last += line.length(); // maybe also +2 to compensate for '\n' ?
@@ -339,22 +340,31 @@ public class Engine {
 	}*/
 	
 	// dummy main method, remove if no longer needed
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Engine Engine = new Engine();
 		Engine.setReg(1, 123);
 		Engine.setReg(2, 17);
 		Engine.functions.get("AR").execute(1, 2);
 		//System.out.println(Engine.getReg(1));
 		//System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
-		String a = "ABC : JP A45";
+		//String a = "ABC : JP A45";
 		//System.out.println(a.indexOf(" : "));
-        for (int[] arr : Engine.getPos(a)) {
+        /*for (int[] arr : Engine.getPos(a)) {
             System.out.println(Arrays.toString(arr));
         }
-        /*List<List<Integer>> temp = new ArrayList<List<Integer>>();
+        List<List<Integer>> temp = new ArrayList<List<Integer>>();
         for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
         temp.get(3).add(-1);
         System.out.println(temp.size());
         System.out.println(temp.get(3).get(0));*/
+        
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        String line; String raw = "";
+
+        while ((line = in.readLine()) != null && !line.equals("END")) {
+        	raw += line + "\n";
+        }
+        int[][] res = Engine.split(raw);
+        System.out.println(Arrays.deepToString(res));
 	}
 }
