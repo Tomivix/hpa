@@ -1,12 +1,13 @@
 package pseudo;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
 public class Engine {
 	//const values
 	
-	public static final byte ZERO = 0;   // <-- do we really need to make constants for that?
+	public static final byte ZERO = 0;
 	public static final byte POSITIVE = 1;
 	public static final byte NEGATIVE = 2;
 	public static final byte ERROR = 3;
@@ -38,7 +39,7 @@ public class Engine {
 	private HashMap<Integer, Integer> vars;
 	private HashMap<String, Integer> varLabels;
 	private HashMap<String, Function> functions;
-	private String[] mathOps; //new code
+	private String[] mathOps;
 	private int[] regs;
 	
 	private int lastVar;
@@ -53,7 +54,7 @@ public class Engine {
 		varLabels = new HashMap<>();
 		functions = new HashMap<>();
 		
-		mathOps = new String[]{"A","S","M","D","C"};  //new code
+		mathOps = new String[]{"A","S","M","D","C"};
 
 		regs = new int[16];
 		// for(int reg : regs) reg = 0;  <-- registers should start with random value
@@ -145,48 +146,6 @@ public class Engine {
 			});
 		}
 		
-		/* bulk function above takes care of those, will get removed
-		
-		functions.put("AR", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) + getReg(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("SR", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) - getReg(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("MR", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) * getReg(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-	
-		functions.put("DR", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) / getReg(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("CR", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) - getReg(arg2);
-				setFlag(reg);
-			}
-		});
-		*/
-		
 		functions.put("LR", new Function(){
 			public void execute(int arg1, int arg2){
 				int reg = getReg(arg2);
@@ -216,48 +175,6 @@ public class Engine {
 				}
 			});
 		}
-		
-		/* bulk function above takes care of those, will get removed
-		
-		functions.put("A", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) + getVar(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("S", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) - getVar(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("M", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) * getVar(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-	
-		functions.put("D", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) / getVar(arg2);
-				setReg(arg1, reg);
-				setFlag(reg);
-			}
-		});
-		
-		functions.put("C", new Function(){
-			public void execute(int arg1, int arg2){
-				int reg = getReg(arg1) - getVar(arg2);
-				setFlag(reg);
-			}
-		});
-		*/
 		
 		functions.put("L", new Function(){
 			public void execute(int arg1, int arg2){
@@ -344,17 +261,38 @@ public class Engine {
 		return type;
 	}
 	
-	// method getPos takes string line returns array containg start.end index of each part
-	public int[][] getPos(String line) {
-		int temp = 0; int res[][] = new int[4][2];
+	// takes string line and type of command from parse() (subject to change)
+	// returns array res containing start/end index of each part depending on type
+	// (0 - possible label) 1 - command name 2 - first parameter (3 - second parameter)
+	// -1 means no match was found (part with [-1,-1] return doesn't exist in given string)
+	public int[][] getPos(String line) {		
+		int temp; int res[][] = new int[4][2];		
+		for(int[] sub : res) Arrays.fill(sub, -1);
+		int type; if((type = this.parse(line))== 0) {
+			this.flag = ERROR; return res;
+		} 
 		if((temp = line.indexOf(" : ") + 1) != 0) {
-			res[0][0] = 0; res[0][1] = temp - 2;
-			line = line.substring(++temp);
+			res[0][1] = temp - 2; res[0][0] = 0;
+			temp += 2; line = line.substring(temp);
 		}
-		res[1][0] = temp;
+		res[1][1] = line.indexOf(" ") + temp - 1;
+		res[1][0] = temp; res[2][0] = res[1][1] + 2;
+		if(type < 3) {
+			res[2][1] = line.indexOf(",") + temp - 1;
+			res[3][1] = line.length() + temp - 1;
+			res[3][0] = res[2][1] + 2;
+		} else if(type > 3) { int temp2; 
+			if((temp2 = line.indexOf("*") - 1) != -2)
+			res[2][1] = temp + temp2; else res[2][0] = -1;
+			if(type == 4) {				
+				res[3][1] = line.indexOf(")") + temp - 1;
+				res[3][0] = line.indexOf("(") + temp + 1;
+			}
+		} else res[2][1] = line.length() + temp - 1;
 		return res;
 	}
 	
+	/* not working for now	
 	public boolean split(String line) {
 		String[] res = new String[4];
 		int temp;
@@ -362,7 +300,7 @@ public class Engine {
 			res[0] = line.substring(0,--temp) + "";
 		}
 		return true;
-	}
+	}*/
 	
 	// dummy main method, remove if no longer needed
 	public static void main(String[] args) {
@@ -371,9 +309,11 @@ public class Engine {
 		Engine.setReg(2, 17);
 		Engine.functions.get("AR").execute(1, 2);
 		//System.out.println(Engine.getReg(1));
-		System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
-		String a = "abc : def";
-		System.out.println(a.indexOf(" : "));
+		//System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
+		String a = "ABC : DS 74*INTEGER";
+		//System.out.println(a.indexOf(" : "));
+        for (int[] arr : Engine.getPos(a)) {
+            System.out.println(Arrays.toString(arr));
+        }
 	}
-
 }
