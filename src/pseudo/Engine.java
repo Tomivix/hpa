@@ -1,7 +1,9 @@
 package pseudo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class Engine {
@@ -292,6 +294,40 @@ public class Engine {
 		return res;
 	}
 	
+	// takes all the lines of the code and returns int[][] containing indexes
+	// return syntax (different from sugested by Aicedosh to match above functions)
+	// int[0] = {Label1Index, Label1Length, Label2Index, Label2Length, ...}
+	// int[1] = {Order1Index, Order1Length, Order2Index, Order2Length, ...}
+	// int[2] = {Parameter1Index, Parameter1Length, Parameter2Index, Parameter2Length, ...}
+	// int[3] = {InvalidLine1Index, InvalidLine1Length, InvalidLine2Index, InvalidLine2Length, ...}
+	public int[][] split(String raw) {
+		if(raw.length() == 0) return new int[][]{new int[]{-1,-1}};
+        List<List<Integer>> temp = new ArrayList<List<Integer>>();
+        for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
+		String[] lines = raw.split("\n"); int last = 0;
+		for(String line : lines) {
+			if(line.length() == 0) continue; 
+			if(this.parse(line) == 0) {
+				temp.get(3).add(last); temp.get(3).add(line.length());
+			} else {
+				int[][] res = this.getPos(line);
+				temp.get(0).add(res[1][0] + last);
+				temp.get(0).add(res[1][1] - res[1][0] + 1 + last);
+				for(int i = 0; i < 4; i++) {
+					if(!Arrays.equals(res[i], new int[]{-1,-1})) {
+						int j = (i == 3) ? 2 : i;
+						temp.get(j).add(res[i][0] + last);
+						temp.get(j).add(res[i][1] - res[i][0] + 1 + last);
+					}
+				}
+			} last += line.length(); // maybe also +2 to compensate for '\n' ?
+		} int[][] res = new int[4][];
+		for(int i = 0; i < 4; i++) {
+			res[i] = new int[temp.get(i).size()]; int j = 0;
+			for(Integer pos : temp.get(i)) res[i][j++] = pos;				
+		} return res;
+	}
+	
 	/* not working for now	
 	public boolean split(String line) {
 		String[] res = new String[4];
@@ -310,10 +346,15 @@ public class Engine {
 		Engine.functions.get("AR").execute(1, 2);
 		//System.out.println(Engine.getReg(1));
 		//System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
-		String a = "ABC : DS 74*INTEGER";
+		String a = "ABC : JP A45";
 		//System.out.println(a.indexOf(" : "));
         for (int[] arr : Engine.getPos(a)) {
             System.out.println(Arrays.toString(arr));
         }
+        /*List<List<Integer>> temp = new ArrayList<List<Integer>>();
+        for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
+        temp.get(3).add(-1);
+        System.out.println(temp.size());
+        System.out.println(temp.get(3).get(0));*/
 	}
 }
