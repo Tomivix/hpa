@@ -21,7 +21,7 @@ public class OrderStyledDocument extends ColorStyledDocument {
 		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Italic, true), StyleConstants.Foreground, Color.ORANGE);
 		dirStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.CYAN);
 		dFont = cont.getFont(defStyle);
-		numHeader.updateHeader("", dFont);
+		numHeader.updateHeader(dFont);
 	}
 	
 	public void recalculateStyles(){

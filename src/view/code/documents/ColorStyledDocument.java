@@ -22,7 +22,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 		try {
 			super.insertString(offset, str.toUpperCase(), a);
 			recalculateStyles();
-			numHeader.updateHeader(super.getText(0, super.getLength()), dFont);
+			numHeader.updateHeader(dFont);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
@@ -33,7 +33,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 		try {
 			super.remove(offset, length);
 			recalculateStyles();
-			numHeader.updateHeader(super.getText(0, super.getLength()), dFont);
+			numHeader.updateHeader(dFont);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
