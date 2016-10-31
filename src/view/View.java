@@ -1,21 +1,21 @@
 package view;
 
 import javax.swing.JFrame;
-import javax.swing.SpringLayout;
+import javax.swing.JSplitPane;
 
 import view.code.CodePanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
+import java.awt.GridLayout;
 
-import static javax.swing.SpringLayout.*;
 
 public class View {
 	public static final byte RR = 0, MR = 1, RM = 2;
 	
 	public static View Instance;
 	
-	public final static int FRAME_WIDTH = 1050, FRAME_HEIGHT = 730;
+	public final static int FRAME_WIDTH = 1070, FRAME_HEIGHT = 730;
 	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
 	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public final static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
@@ -28,27 +28,24 @@ public class View {
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
 	public static int[] registers, memoryCells; //FIXME: Placholder, will be replaced with Engine getters
-	private SpringLayout layout;
 	public View(){
 		Instance = this;
 		
 		frame = new JFrame("Pseudo Assembler Visualizer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(layout = new SpringLayout());
+		frame.setLayout(new GridLayout(1, 0));
+		
+		Dimension minDim = new Dimension(REGISTER_WIDTH + REG_MEM_PAD + MEM_CELL_WIDTH + 5, 0);
 		
 		codePanel = new CodePanel();
-		frame.add(codePanel);
-		layout.putConstraint(WEST, codePanel, PANELS_PAD, WEST, frame.getContentPane());
-		layout.putConstraint(NORTH, codePanel, PANELS_PAD, NORTH, frame.getContentPane());
-		layout.putConstraint(EAST, codePanel, -PANELS_PAD, HORIZONTAL_CENTER, frame.getContentPane());
-		layout.putConstraint(SOUTH, codePanel, -PANELS_PAD, SOUTH, frame.getContentPane());
+		codePanel.setMinimumSize(minDim);
 		
 		rmPanel = new RMPanel();
-		frame.add(rmPanel);
-		layout.putConstraint(NORTH, rmPanel, PANELS_PAD, NORTH, frame.getContentPane());
-		layout.putConstraint(SOUTH, rmPanel, -PANELS_PAD, SOUTH, frame.getContentPane());
-		layout.putConstraint(EAST, rmPanel, -PANELS_PAD, EAST, frame.getContentPane());
-		layout.putConstraint(WEST, rmPanel, PANELS_PAD, HORIZONTAL_CENTER, frame.getContentPane());
+		rmPanel.setMinimumSize(minDim);
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, codePanel, rmPanel);
+		splitPane.setDividerLocation(FRAME_WIDTH/2);
+		frame.add(splitPane);
 		
 		frame.setVisible(true);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);

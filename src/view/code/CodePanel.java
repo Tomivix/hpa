@@ -31,6 +31,7 @@ public class CodePanel extends JPanel{
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, dirArea, orderArea);
 		splitPane.setDividerLocation(View.DEFAULT_DIR_PANE_HEIGHT);
+		splitPane.setOneTouchExpandable(true);
 		add(splitPane);
 	}
 }

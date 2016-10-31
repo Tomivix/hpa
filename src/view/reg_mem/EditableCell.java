@@ -1,8 +1,12 @@
 package view.reg_mem;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -11,12 +15,16 @@ import javax.swing.SpringLayout;
 
 import static javax.swing.SpringLayout.*;
 
-public abstract class EditableCell extends JPanel {
+public abstract class EditableCell extends JPanel implements MouseListener {
 	private static final long serialVersionUID = 1L;
 	
+	protected int index;
+	protected boolean isRegister = false;
 	protected int topX, topY;
 	private SpringLayout layout;
 	private JLabel label, value;
+	protected Color bgDefColor = Color.white, bgHoverColor = Color.lightGray, labelDefColor = Color.lightGray, labelHoverColor = Color.black;
+	protected Color bgCurrColor = bgDefColor, labelCurrColor = labelDefColor;
 	public EditableCell(int topX, int topY){
 		super();
 		this.topX = topX;
@@ -24,11 +32,14 @@ public abstract class EditableCell extends JPanel {
 		super.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		layout = new SpringLayout();
 		super.setLayout(layout);
+		super.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		super.setToolTipText("Click to edit...");
+		super.addMouseListener(this);
 	}
 	
 	protected void setupLabels(){
 		label = new JLabel(getLabel());
-		label.setForeground(Color.lightGray);
+		label.setForeground(labelDefColor);
 		super.add(label);
 		FontMetrics fm = label.getFontMetrics(label.getFont());
 		layout.putConstraint(WEST, label, 0, WEST, this);
@@ -63,5 +74,36 @@ public abstract class EditableCell extends JPanel {
 	public int getTopY(){
 		return topY;
 	}
-	//TODO: Value edition
+	
+	@Override
+	public void paint(Graphics g){
+		label.setForeground(labelCurrColor);
+		this.setBackground(bgCurrColor);
+		super.paint(g);
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e){
+		bgCurrColor = bgHoverColor;
+		labelCurrColor = labelHoverColor;
+		repaint();
+	}
+	
+	@Override
+	public void mouseExited(MouseEvent e){
+		bgCurrColor = bgDefColor;
+		labelCurrColor = labelDefColor;
+		repaint();
+	}
+	
+	
+	@Override
+	public void mouseReleased(MouseEvent e){
+		
+	}
+	
+	@Override
+	public void mousePressed(MouseEvent e){
+		
+	}
 }

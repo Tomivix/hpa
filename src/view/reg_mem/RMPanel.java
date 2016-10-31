@@ -8,6 +8,7 @@ import view.View;
 import static javax.swing.SpringLayout.*;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -57,6 +58,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 	public void paint(Graphics g){
 		super.paint(g);
 		
+		g.setColor(Color.blue);
 		int memCellOffset;
 		switch(lastOrderMode){
 		case View.RR:
