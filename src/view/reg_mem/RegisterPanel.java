@@ -1,45 +1,54 @@
 package view.reg_mem;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Point;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 
 import view.View;
+
+import static javax.swing.SpringLayout.*;
 
 public class RegisterPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
-	private int[] registers;
-	public void setRegisters(int[] registers) {
-		this.registers = registers;
+	private SpringLayout layout;
+	private JLabel panelLabel;
+	private RegisterCell[] registerCells;
+	public RegisterPanel(){
+		super();
+		super.setLayout(layout = new SpringLayout());
+		super.setBorder(BorderFactory.createDashedBorder(null, 5, 5));
+		panelLabel = new JLabel("Registers");
+		super.add(panelLabel);
+		layout.putConstraint(NORTH, panelLabel, 5, NORTH, this);
+		layout.putConstraint(WEST, panelLabel, 5, WEST, this);
+		layout.putConstraint(EAST, panelLabel, 0, EAST, this);
+		layout.putConstraint(SOUTH, panelLabel, View.LABEL_HEIGHT, NORTH, panelLabel);
 	}
 	
-	@Override
-	public void paint(Graphics g){
-		super.paint(g);
-		
-		FontMetrics fm = g.getFontMetrics();
-		int strH = fm.getHeight();
-		for(int i = 0; i < registers.length; i++){
-			g.drawRect(0, i*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD, View.REGISTER_WIDTH, View.REGISTER_HEIGHT);
-			if(i == RMPanel.lastReg1 || i == RMPanel.lastReg2){
-				g.setFont(g.getFont().deriveFont(Font.BOLD));
-				fm = g.getFontMetrics();
-			}
-			int strW = fm.stringWidth(""+registers[i]);
-			g.drawString(""+registers[i], View.REGISTER_WIDTH/2-strW/2, i*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+(View.REGISTER_HEIGHT/2)+View.PANEL_DRAW_UP_PAD+(strH/2)+View.FONT_VERT_OFF);
-			if(i == RMPanel.lastReg1 || i == RMPanel.lastReg2){
-				g.setFont(g.getFont().deriveFont(Font.PLAIN));
-				fm = g.getFontMetrics();
-			}
+	public void setRegisters() {
+		this.registerCells = new RegisterCell[View.registers.length];
+		for(int i = 0; i < View.registers.length; i++){
+			registerCells[i]= new RegisterCell(0, i*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, i);
+		}
+		for(int i = 0; i < registerCells.length; i++){
+			RegisterCell regCell = registerCells[i];
+			super.add(regCell);
+			layout.putConstraint(WEST, regCell, 1, WEST, this);
+			layout.putConstraint(EAST, regCell, -1, EAST, this);
+			layout.putConstraint(NORTH, regCell, regCell.getTopY(), NORTH, this);
+			layout.putConstraint(SOUTH, regCell, View.REGISTER_HEIGHT, NORTH, regCell);
 		}
 	}
 	
 	public Point getRelativeRegisterLoc(int regIndex){
-		return new Point(View.REGISTER_WIDTH/2, View.REGISTER_HEIGHT/2 + regIndex*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD);
+		return new Point(registerCells[regIndex].getTopX()+View.REGISTER_WIDTH/2, registerCells[regIndex].getTopY()+View.REGISTER_HEIGHT/2);
 	}
 
+	public void updateRegisters(int iReg){
+		registerCells[iReg].updateValue();
+	}
 }

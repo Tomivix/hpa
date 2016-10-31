@@ -29,7 +29,9 @@ public class DirStyledDocument extends ColorStyledDocument {
 	public void recalculateStyles(){
 		try{
 			super.setCharacterAttributes(0, super.getLength(), defStyle, true);
+
 			int[][] indexes = new Engine().split(super.getText(0, super.getLength()), true);
+
 			for(int i = 0; i < indexes[0].length; i++){
 				super.setCharacterAttributes(indexes[0][i], indexes[0][++i], labelStyle, true);
 			}
