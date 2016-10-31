@@ -256,13 +256,16 @@ public class Engine {
 	// returns true only if the command has valid syntax (can possibly be executed)
 	// this method (so far) doesn't check if specified memory cells were declared!
 	// previous label checking regex ([A-Z0-9]+ : |^)
-	public int parse(String line) {
+	public int parse(String line, boolean mode) {
 		int type = 0;
-		type = (line.matches("([A-Z][A-Z0-9]* : |^)(AR|SR|MR|DR|CR|LR) [0-9]+,[0-9]+")) ? 1 : type;
-		type = (line.matches("([A-Z][A-Z0-9]* : |^)(A|S|M|D|C|L|LA|ST) [0-9]+,([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 2 : type;
-		type = (line.matches("([A-Z][A-Z0-9]* : |^)(J|JN|JP|JZ) ([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 3 : type;
-		type = (line.matches("[A-Z][A-Z0-9]* : DC ([0-9]+\\*|)(INTEGER|INT)\\(-?[0-9]+\\)")) ? 4 : type;
-		type = (line.matches("[A-Z][A-Z0-9]* : DS ([0-9]+\\*|)(INTEGER|INT)")) ? 5 : type;
+		if(!mode) {
+			type = (line.matches("([A-Z][A-Z0-9]* : |^)(AR|SR|MR|DR|CR|LR) [0-9]+,[0-9]+")) ? 1 : type;
+			type = (line.matches("([A-Z][A-Z0-9]* : |^)(A|S|M|D|C|L|LA|ST) [0-9]+,([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 2 : type;
+			type = (line.matches("([A-Z][A-Z0-9]* : |^)(J|JN|JP|JZ) ([A-Z][A-Z0-9]*|[0-9]+\\([0-9]+\\))")) ? 3 : type;
+		} else {
+			type = (line.matches("[A-Z][A-Z0-9]* : DC ([0-9]+\\*|)(INTEGER|INT)\\(-?[0-9]+\\)")) ? 4 : type;
+			type = (line.matches("[A-Z][A-Z0-9]* : DS ([0-9]+\\*|)(INTEGER|INT)")) ? 5 : type;
+		}
 		return type;
 	}
 	
@@ -270,10 +273,10 @@ public class Engine {
 	// returns array res containing start/end index of each part depending on type
 	// (0 - possible label) 1 - command name 2 - first parameter (3 - second parameter)
 	// -1 means no match was found (part with [-1,-1] return doesn't exist in given string)
-	public int[][] getPos(String line) {		
+	public int[][] getPos(String line, boolean mode) {		
 		int temp; int res[][] = new int[4][2];		
 		for(int[] sub : res) Arrays.fill(sub, -1);
-		int type; if((type = this.parse(line))== 0) {
+		int type; if((type = this.parse(line, mode)) == 0) {
 			this.flag = ERROR; return res;
 		} 
 		if((temp = line.indexOf(" : ") + 1) != 0) {
@@ -303,17 +306,17 @@ public class Engine {
 	// int[1] = {Order1Index, Order1Length, Order2Index, Order2Length, ...}
 	// int[2] = {Parameter1Index, Parameter1Length, Parameter2Index, Parameter2Length, ...}
 	// int[3] = {InvalidLine1Index, InvalidLine1Length, InvalidLine2Index, InvalidLine2Length, ...}
-	public int[][] split(String raw) {
-		if(raw.length() == 0) return new int[][]{new int[]{-1,-1}};
+	public int[][] split(String raw, boolean mode) {
+		if(raw.length() == 0) return new int[][]{new int[]{},new int[]{},new int[]{},new int[]{}};
         List<List<Integer>> temp = new ArrayList<List<Integer>>();
         for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
 		String[] lines = raw.split("\n"); int last = 0;
 		for(String line : lines) {
 			if(line.length() == 0) continue; 
-			if(this.parse(line) == 0) {
+			if(this.parse(line, mode) == 0) {
 				temp.get(3).add(last); temp.get(3).add(line.length());
 			} else {
-				int[][] res = this.getPos(line);
+				int[][] res = this.getPos(line, mode);
 				for(int i = 0; i < 4; i++) {
 					if(!Arrays.equals(res[i], new int[]{-1,-1})) {
 						int j = (i == 3) ? 2 : i;
@@ -321,7 +324,7 @@ public class Engine {
 						temp.get(j).add(res[i][1] - res[i][0] + 1);
 					}
 				}
-			} last += line.length(); // maybe also +2 to compensate for '\n' ?
+			} last += line.length() + 1; // maybe also +2 to compensate for '\n' ?
 		} int[][] res = new int[4][];
 		for(int i = 0; i < 4; i++) {
 			res[i] = new int[temp.get(i).size()]; int j = 0;
@@ -358,13 +361,14 @@ public class Engine {
         System.out.println(temp.size());
         System.out.println(temp.get(3).get(0));*/
         
+		 // code below doesn't work anymore - offset by 1
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String line; String raw = "";
 
         while ((line = in.readLine()) != null && !line.equals("END")) {
         	raw += line + "\n";
         }
-        int[][] res = Engine.split(raw);
+        int[][] res = Engine.split(raw, false);
         System.out.println(Arrays.deepToString(res));
 	}
 }
