@@ -312,7 +312,7 @@ public class Engine {
         for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
 		String[] lines = raw.split("\n"); int last = 0;
 		for(String line : lines) {
-			if(line.length() == 0) continue; 
+			if(line.length() == 0) {last++; continue;} 
 			if(this.parse(line, mode) == 0) {
 				temp.get(3).add(last); temp.get(3).add(line.length());
 			} else {
