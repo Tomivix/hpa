@@ -1,4 +1,4 @@
-package pseudo;
+package core;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -250,7 +250,7 @@ public class Engine {
 		});
 		
 	}
-	
+	/*
 	// public boolean parse(String line) returns boolean
 	// checks if the raw command provided by user has correct HPA-compliant syntax
 	// returns true only if the command has valid syntax (can possibly be executed)
@@ -324,13 +324,13 @@ public class Engine {
 						temp.get(j).add(res[i][1] - res[i][0] + 1);
 					}
 				}
-			} last += line.length() + 1; // maybe also +2 to compensate for '\n' ?
+			} last += line.length() + 1;
 		} int[][] res = new int[4][];
 		for(int i = 0; i < 4; i++) {
 			res[i] = new int[temp.get(i).size()]; int j = 0;
 			for(Integer pos : temp.get(i)) res[i][j++] = pos;				
 		} return res;
-	}
+	}*/
 	
 	/* not working for now	
 	public boolean split(String line) {
@@ -348,18 +348,6 @@ public class Engine {
 		Engine.setReg(1, 123);
 		Engine.setReg(2, 17);
 		Engine.functions.get("AR").execute(1, 2);
-		//System.out.println(Engine.getReg(1));
-		//System.out.println(Engine.parse("A435 : DC 54654*INTEGER(-3)"));
-		//String a = "ABC : JP A45";
-		//System.out.println(a.indexOf(" : "));
-        /*for (int[] arr : Engine.getPos(a)) {
-            System.out.println(Arrays.toString(arr));
-        }
-        List<List<Integer>> temp = new ArrayList<List<Integer>>();
-        for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
-        temp.get(3).add(-1);
-        System.out.println(temp.size());
-        System.out.println(temp.get(3).get(0));*/
         
 		 // code below doesn't work anymore - offset by 1
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -368,7 +356,7 @@ public class Engine {
         while ((line = in.readLine()) != null && !line.equals("END")) {
         	raw += line + "\n";
         }
-        int[][] res = Engine.split(raw, false);
+        int[][] res = Parser.split(raw, false);
         System.out.println(Arrays.deepToString(res));
 	}
 }
