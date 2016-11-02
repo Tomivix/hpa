@@ -1,13 +1,15 @@
 package view.code.documents;
 
 import java.awt.Color;
+import java.util.List;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import pseudo.Engine;
+import core.Engine;
+import core.TextObject;
 import view.code.NumHeader;
 
 public class OrderStyledDocument extends ColorStyledDocument {
@@ -29,23 +31,22 @@ public class OrderStyledDocument extends ColorStyledDocument {
 	public void recalculateStyles(){
 		try{
 			super.setCharacterAttributes(0, super.getLength(), defStyle, true);
-
-			int[][] indexes = new Engine().split(super.getText(0, super.getLength()), false);
-
-			for(int i = 0; i < indexes[0].length; i++){
-				super.setCharacterAttributes(indexes[0][i], indexes[0][++i], labelStyle, true);
-			}
-			for(int i = 0; i < indexes[1].length; i++){
-				super.setCharacterAttributes(indexes[1][i], indexes[1][++i], orderStyle, true);
-			}
-			for(int i = 0; i < indexes[2].length; i++){
-				super.setCharacterAttributes(indexes[2][i], indexes[2][++i], paramStyle, true);
-			}
-			for(int i = 0; i < indexes[3].length; i++){
-				super.setCharacterAttributes(indexes[3][i], indexes[3][++i], invStyle, true);
+			List<TextObject> words = new Engine().split(super.getText(0, super.getLength()), true);
+			for(TextObject word : words){
+				super.setCharacterAttributes(word.getStart(), word.getLength(), getStyle(word.getType()), true);
 			}
 		}catch (BadLocationException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private AttributeSet getStyle(int id){
+		switch(id){
+			case 0: return labelStyle;
+			case 1: return orderStyle;
+			case 2: return paramStyle;
+			case 3: return invStyle;
+			default: return defStyle;
 		}
 	}
 }
