@@ -1,4 +1,4 @@
-package pseudo;
+package core;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -300,36 +300,45 @@ public class Engine {
 		return res;
 	}
 	
+	
 	// takes all the lines of the code and returns int[][] containing indexes
 	// return syntax (different from sugested by Aicedosh to match above functions)
 	// int[0] = {Label1Index, Label1Length, Label2Index, Label2Length, ...}
 	// int[1] = {Order1Index, Order1Length, Order2Index, Order2Length, ...}
 	// int[2] = {Parameter1Index, Parameter1Length, Parameter2Index, Parameter2Length, ...}
 	// int[3] = {InvalidLine1Index, InvalidLine1Length, InvalidLine2Index, InvalidLine2Length, ...}
-	public int[][] split(String raw, boolean mode) {
-		if(raw.length() == 0) return new int[][]{new int[]{},new int[]{},new int[]{},new int[]{}};
-        List<List<Integer>> temp = new ArrayList<List<Integer>>();
-        for(int i = 0; i < 4; i++) temp.add(new ArrayList<Integer>());
-		String[] lines = raw.split("\n"); int last = 0;
-		for(String line : lines) {
+	
+	/** mrwasp's version
+	 * 
+	 * @param raw - all the lines of code
+	 * @param mode - don't know
+	 * @return List<TextObject> - all 'words' with start index, length and type (0-label, 1-order, 2-parameter, 3-invalid)
+	 */
+	
+	public List<TextObject> split(String raw, boolean mode) {
+		List<TextObject> words = new ArrayList<>();
+		String[] lines = raw.split("\n");
+		int last = 0;
+		
+		for(String line : lines){
 			if(line.length() == 0) continue; 
 			if(this.parse(line, mode) == 0) {
-				temp.get(3).add(last); temp.get(3).add(line.length());
-			} else {
+				words.add(new TextObject(last, line.length(), 3));
+			}
+			else {
 				int[][] res = this.getPos(line, mode);
 				for(int i = 0; i < 4; i++) {
 					if(!Arrays.equals(res[i], new int[]{-1,-1})) {
 						int j = (i == 3) ? 2 : i;
-						temp.get(j).add(res[i][0] + last);
-						temp.get(j).add(res[i][1] - res[i][0] + 1);
+						//'j' is a type of text, isn't it?
+						int start = res[i][0] + last;
+						int length = res[i][1] - res[i][0] + 1;
+						words.add(new TextObject(start, length, j));
 					}
 				}
 			} last += line.length() + 1; // maybe also +2 to compensate for '\n' ?
-		} int[][] res = new int[4][];
-		for(int i = 0; i < 4; i++) {
-			res[i] = new int[temp.get(i).size()]; int j = 0;
-			for(Integer pos : temp.get(i)) res[i][j++] = pos;				
-		} return res;
+		}
+		return words;
 	}
 	
 	/* not working for now	
@@ -368,7 +377,7 @@ public class Engine {
         while ((line = in.readLine()) != null && !line.equals("END")) {
         	raw += line + "\n";
         }
-        int[][] res = Engine.split(raw, false);
-        System.out.println(Arrays.deepToString(res));
+        //int[][] res = Engine.split(raw, false);
+        //System.out.println(Arrays.deepToString(res));
 	}
 }
