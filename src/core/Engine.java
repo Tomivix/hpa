@@ -1,11 +1,11 @@
 package core;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
+
+import javax.swing.SwingUtilities;
+
+import view.View;
 
 public class Engine {
 	//const values
@@ -41,6 +41,8 @@ public class Engine {
 	
 	//all the rest
 	
+	public static Engine current;
+	
 	private HashMap<Integer, String> orders;
 	private HashMap<String, Integer> orderLabels;
 	private HashMap<Integer, Integer> vars;
@@ -55,6 +57,7 @@ public class Engine {
 	private byte flag;
 	
 	public Engine(){
+		current = this;
 		orders = new HashMap<>();
 		orderLabels = new HashMap<>();
 		vars = new HashMap<>();
@@ -71,6 +74,15 @@ public class Engine {
 		flag = ERROR;
 		
 		createFunctions();
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				View v = new View();
+				v.setRegisters();
+				v.setMemoryCells();
+			}
+		});
 	}
 	
 	public String debug(){
@@ -88,6 +100,11 @@ public class Engine {
 	
 	public void setReg(int id, int value){
 		regs[id] = value;
+		View.Instance.updateRegister(id);
+	}
+	
+	public int getRegCount(){
+		return regs.length;
 	}
 	
 	public void addVar(int value){
@@ -101,6 +118,11 @@ public class Engine {
 	
 	public void setVar(int id, int value){
 		vars.replace(id, value);
+		View.Instance.updateMemCell(id/4);
+	}
+	
+	public int getVarCount(){
+		return vars.size();
 	}
 	
 	public void addOrder(String order, int size){
@@ -228,14 +250,32 @@ public class Engine {
 		});		
 	}
 	
-	// dummy main method, remove if no longer needed
-	public static void main(String[] args) throws IOException {
+	public void buildDirectivesFromString(String s){
+		//TODO
+		System.out.println(s);
 		
-	// all the code below doesn't work anymore - offset by 1
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String line; String raw = "";
-
-        while ((line = in.readLine()) != null && !line.equals("END")) raw += line + "\n";
-        int[][] res = Parser.split(raw, false); System.out.println(Arrays.deepToString(res));
+		View.Instance.setRegisters();	//Needed to coorectly display graphics
+		View.Instance.setMemoryCells();
+	}
+	
+	public void buildOrdersFromString(String s){
+		//TODO
+		System.out.println(s);
+	}
+	
+	public void run(){
+		//TODO
+		//Probably will run step every few seconds
+	}
+	
+	public void step(){
+		//TODO
+		
+		//Set the arrow pointing on register and memory panel 
+		//View.Instance.updateValues(<last_modified_source>, <last_modified_destination>, <MODE>);
+		//MODE:
+		//		-View.RM (Register -> Memory cell)
+		//		-View.RR (Register -> Register)
+		//		-View.MR (Memory cell -> Register)
 	}
 }

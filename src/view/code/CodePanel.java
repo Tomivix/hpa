@@ -5,6 +5,8 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import view.View;
 import view.code.documents.DirStyledDocument;
@@ -31,6 +33,29 @@ public class CodePanel extends JPanel{
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, dirArea, orderArea);
 		splitPane.setDividerLocation(View.DEFAULT_DIR_PANE_HEIGHT);
+		splitPane.setOneTouchExpandable(true);
 		add(splitPane);
+	}
+	
+	public String getDirectives(){
+		Document d = dirPane.getDocument();
+		String out = "";
+		try{
+			out = d.getText(0, d.getLength());
+		}catch(BadLocationException e){
+			e.printStackTrace();
+		}
+		return out;
+	}
+	
+	public String getOrders(){
+		Document d = ordersPane.getDocument();
+		String out = "";
+		try{
+			out = d.getText(0, d.getLength());
+		}catch(BadLocationException e){
+			e.printStackTrace();
+		}
+		return out;
 	}
 }

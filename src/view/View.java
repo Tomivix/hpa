@@ -1,21 +1,27 @@
 package view;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.SpringLayout;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
+import core.Engine;
 import view.code.CodePanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import static javax.swing.SpringLayout.*;
 
 public class View {
 	public static final byte RR = 0, MR = 1, RM = 2;
 	
 	public static View Instance;
 	
-	public final static int FRAME_WIDTH = 1050, FRAME_HEIGHT = 730;
+	public final static int FRAME_WIDTH = 1070, FRAME_HEIGHT = 730;
 	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
 	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public final static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
@@ -27,28 +33,64 @@ public class View {
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
-	public static int[] registers, memoryCells; //FIXME: Placholder, will be replaced with Engine getters
-	private SpringLayout layout;
 	public View(){
 		Instance = this;
 		
 		frame = new JFrame("Pseudo Assembler Visualizer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(layout = new SpringLayout());
+		frame.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		JPanel buttonPanel = new JPanel();
+		JButton buildButton = new JButton("Build");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.buildDirectivesFromString(codePanel.getDirectives());
+				Engine.current.buildOrdersFromString(codePanel.getOrders());;
+			}
+		});
+		
+		JButton runButton = new JButton("Run");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.run();
+			}
+		});
+		
+		JButton stepButton = new JButton("Step");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.step();
+			}
+		});
+		
+		buttonPanel.add(buildButton);
+		buttonPanel.add(runButton);
+		buttonPanel.add(stepButton);
+		
+		c.fill = 1;
+		c.gridx = 1;
+		c.gridy = 1;
+		c.weightx = 1;
+		c.weighty = 1;
+		frame.add(buttonPanel, c);
+		
+		Dimension minDim = new Dimension(REGISTER_WIDTH + REG_MEM_PAD + MEM_CELL_WIDTH + 5, 0);
 		
 		codePanel = new CodePanel();
-		frame.add(codePanel);
-		layout.putConstraint(WEST, codePanel, PANELS_PAD, WEST, frame.getContentPane());
-		layout.putConstraint(NORTH, codePanel, PANELS_PAD, NORTH, frame.getContentPane());
-		layout.putConstraint(EAST, codePanel, -PANELS_PAD, HORIZONTAL_CENTER, frame.getContentPane());
-		layout.putConstraint(SOUTH, codePanel, -PANELS_PAD, SOUTH, frame.getContentPane());
+		codePanel.setMinimumSize(minDim);
 		
 		rmPanel = new RMPanel();
-		frame.add(rmPanel);
-		layout.putConstraint(NORTH, rmPanel, PANELS_PAD, NORTH, frame.getContentPane());
-		layout.putConstraint(SOUTH, rmPanel, -PANELS_PAD, SOUTH, frame.getContentPane());
-		layout.putConstraint(EAST, rmPanel, -PANELS_PAD, EAST, frame.getContentPane());
-		layout.putConstraint(WEST, rmPanel, PANELS_PAD, HORIZONTAL_CENTER, frame.getContentPane());
+		rmPanel.setMinimumSize(minDim);
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, codePanel, rmPanel);
+		splitPane.setDividerLocation(FRAME_WIDTH/2);
+		c.weighty = 100;
+		c.gridy = 2;
+		frame.add(splitPane, c);
 		
 		frame.setVisible(true);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -56,23 +98,23 @@ public class View {
 		frame.setLocationRelativeTo(null);
 	}
 	
-	public void setRegisters(int[] regs){
-		registers = new int[regs.length];
-		for(int i = 0; i < regs.length; i++){
-			registers[i] = regs[i];
-		}
+	public void setRegisters(){
 		rmPanel.setRegisters();
 	}
 	
-	public void setMemoryCells(int[] cells){
-		memoryCells = new int[cells.length];
-		for(int i = 0; i < cells.length; i++){
-			memoryCells[i] = cells[i];
-		}
+	public void setMemoryCells(){
 		rmPanel.setMemoryCells();
 	}
 	
 	public void updateValues(int reg, int source, byte mode){
 		rmPanel.updateValues(reg, source, mode);
+	}
+	
+	public void updateRegister(int index){
+		rmPanel.updateRegister(index);
+	}
+	
+	public void updateMemCell(int index){
+		rmPanel.updateMemCell(index);
 	}
 }

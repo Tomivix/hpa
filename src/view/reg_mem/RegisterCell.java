@@ -1,20 +1,22 @@
 package view.reg_mem;
 
-import view.View;
+import java.awt.event.MouseEvent;
+
+import core.Engine;
 
 public class RegisterCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
 
-	private int index; 
 	public RegisterCell(int topX, int topY, int index) {
 		super(topX, topY);
 		this.index = index;
+		isRegister = true;
 		setupLabels();
 	}
 	
 	@Override
 	protected int getValue() {
-		return View.registers[index];
+		return Engine.current.getReg(index);
 	}
 
 	@Override
@@ -26,6 +28,11 @@ public class RegisterCell extends EditableCell {
 	@Override
 	protected boolean isLastEdited() {
 		return index == RMPanel.lastReg1 || index == RMPanel.lastReg2;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		ValueEditor.displayRegisterValue(index);
 	}
 	
 	

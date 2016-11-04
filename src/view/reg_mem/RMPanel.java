@@ -3,11 +3,13 @@ package view.reg_mem;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import core.Engine;
 import view.View;
 
 import static javax.swing.SpringLayout.*;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -45,7 +47,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 
 	public void setRegisters() {
 		registerPanel.setRegisters();
-		layout.putConstraint(SOUTH, registerPanel, View.registers.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT+View.LABEL_DOWN_PAD, NORTH, registerPanel);
+		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT+View.LABEL_DOWN_PAD, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
 	
@@ -57,6 +59,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 	public void paint(Graphics g){
 		super.paint(g);
 		
+		g.setColor(Color.blue);
 		int memCellOffset;
 		switch(lastOrderMode){
 		case View.RR:
@@ -125,14 +128,14 @@ public class RMPanel extends JPanel implements ComponentListener {
 			lastReg1 = source;
 			lastReg2 = dest;
 			lastCell = -1;
-			registerPanel.updateRegisters(source);
-			registerPanel.updateRegisters(dest);
+			registerPanel.updateRegister(source);
+			registerPanel.updateRegister(dest);
 			break;
 		case View.RM:
 			lastReg1 = source;
 			lastReg2 = -1;
 			lastCell = dest;
-			registerPanel.updateRegisters(source);
+			registerPanel.updateRegister(source);
 			memoryPanel.updateCell(dest);
 			break;
 		case View.MR:
@@ -140,17 +143,25 @@ public class RMPanel extends JPanel implements ComponentListener {
 			lastReg2 = -1;
 			lastCell = source;
 			memoryPanel.updateCell(source);
-			registerPanel.updateRegisters(dest);
+			registerPanel.updateRegister(dest);
 			break;
 		default:
 			lastOrderMode = -1;
 		}
 		if (lr1 != -1)
-			registerPanel.updateRegisters(lr1);
+			registerPanel.updateRegister(lr1);
 		if (lr2 != -1)
-			registerPanel.updateRegisters(lr2);
+			registerPanel.updateRegister(lr2);
 		if (lc != -1)
 			memoryPanel.updateCell(lc);
+	}
+	
+	public void updateRegister(int index){
+		registerPanel.updateRegister(index);
+	}
+	
+	public void updateMemCell(int index){
+		memoryPanel.updateCell(index);
 	}
 
 

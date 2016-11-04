@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import core.Engine;
 import view.View;
 
 import static javax.swing.SpringLayout.*;
@@ -30,8 +31,8 @@ public class RegisterPanel extends JPanel {
 	}
 	
 	public void setRegisters() {
-		this.registerCells = new RegisterCell[View.registers.length];
-		for(int i = 0; i < View.registers.length; i++){
+		this.registerCells = new RegisterCell[Engine.current.getRegCount()];
+		for(int i = 0; i < Engine.current.getRegCount(); i++){
 			registerCells[i]= new RegisterCell(0, i*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, i);
 		}
 		for(int i = 0; i < registerCells.length; i++){
@@ -48,7 +49,7 @@ public class RegisterPanel extends JPanel {
 		return new Point(registerCells[regIndex].getTopX()+View.REGISTER_WIDTH/2, registerCells[regIndex].getTopY()+View.REGISTER_HEIGHT/2);
 	}
 
-	public void updateRegisters(int iReg){
+	public void updateRegister(int iReg){
 		registerCells[iReg].updateValue();
 	}
 }

@@ -1,12 +1,13 @@
 package view.reg_mem;
 
-import view.View;
+import java.awt.event.MouseEvent;
+
+import core.Engine;
 
 public class MemoryCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
 
 	private String label;
-	private int index;
 	public MemoryCell(int topX, int topY, String label, int index) {
 		super(topX, topY);
 		this.label = label;
@@ -16,7 +17,7 @@ public class MemoryCell extends EditableCell {
 	
 	@Override
 	protected int getValue() {
-		return View.memoryCells[index];
+		return Engine.current.getVar(index);
 	}
 
 	@Override
@@ -35,6 +36,11 @@ public class MemoryCell extends EditableCell {
 	@Override
 	protected boolean isLastEdited() {
 		return index == RMPanel.lastCell;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		ValueEditor.displayCellValue(index, label);
 	}
 
 }
