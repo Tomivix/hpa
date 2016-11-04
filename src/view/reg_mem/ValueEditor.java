@@ -14,7 +14,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import core.Engine;
-import view.View;
 
 import static javax.swing.SpringLayout.*;
 

@@ -118,6 +118,7 @@ public class Engine {
 	
 	public void setVar(int id, int value){
 		vars.replace(id, value);
+		View.Instance.updateMemCell(id/4);
 	}
 	
 	public int getVarCount(){
@@ -247,5 +248,34 @@ public class Engine {
 					addVar((new Random()).nextInt());
 			}
 		});		
+	}
+	
+	public void buildDirectivesFromString(String s){
+		//TODO
+		System.out.println(s);
+		
+		View.Instance.setRegisters();	//Needed to coorectly display graphics
+		View.Instance.setMemoryCells();
+	}
+	
+	public void buildOrdersFromString(String s){
+		//TODO
+		System.out.println(s);
+	}
+	
+	public void run(){
+		//TODO
+		//Probably will run step every few seconds
+	}
+	
+	public void step(){
+		//TODO
+		
+		//Set the arrow pointing on register and memory panel 
+		//View.Instance.updateValues(<last_modified_source>, <last_modified_destination>, <MODE>);
+		//MODE:
+		//		-View.RM (Register -> Memory cell)
+		//		-View.RR (Register -> Register)
+		//		-View.MR (Memory cell -> Register)
 	}
 }

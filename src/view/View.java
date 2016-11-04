@@ -1,13 +1,19 @@
 package view;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import core.Engine;
 import view.code.CodePanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class View {
@@ -32,7 +38,45 @@ public class View {
 		
 		frame = new JFrame("Pseudo Assembler Visualizer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new GridLayout(1, 0));
+		frame.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		JPanel buttonPanel = new JPanel();
+		JButton buildButton = new JButton("Build");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.buildDirectivesFromString(codePanel.getDirectives());
+				Engine.current.buildOrdersFromString(codePanel.getOrders());;
+			}
+		});
+		
+		JButton runButton = new JButton("Run");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.run();
+			}
+		});
+		
+		JButton stepButton = new JButton("Step");
+		buildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.step();
+			}
+		});
+		
+		buttonPanel.add(buildButton);
+		buttonPanel.add(runButton);
+		buttonPanel.add(stepButton);
+		
+		c.fill = 1;
+		c.gridx = 1;
+		c.gridy = 1;
+		c.weightx = 1;
+		c.weighty = 1;
+		frame.add(buttonPanel, c);
 		
 		Dimension minDim = new Dimension(REGISTER_WIDTH + REG_MEM_PAD + MEM_CELL_WIDTH + 5, 0);
 		
@@ -44,7 +88,9 @@ public class View {
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, codePanel, rmPanel);
 		splitPane.setDividerLocation(FRAME_WIDTH/2);
-		frame.add(splitPane);
+		c.weighty = 100;
+		c.gridy = 2;
+		frame.add(splitPane, c);
 		
 		frame.setVisible(true);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -66,5 +112,9 @@ public class View {
 	
 	public void updateRegister(int index){
 		rmPanel.updateRegister(index);
+	}
+	
+	public void updateMemCell(int index){
+		rmPanel.updateMemCell(index);
 	}
 }
