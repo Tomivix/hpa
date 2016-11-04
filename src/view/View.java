@@ -27,7 +27,6 @@ public class View {
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
-	public static int[] registers, memoryCells; //FIXME: Placholder, will be replaced with Engine getters
 	public View(){
 		Instance = this;
 		
@@ -53,23 +52,19 @@ public class View {
 		frame.setLocationRelativeTo(null);
 	}
 	
-	public void setRegisters(int[] regs){
-		registers = new int[regs.length];
-		for(int i = 0; i < regs.length; i++){
-			registers[i] = regs[i];
-		}
+	public void setRegisters(){
 		rmPanel.setRegisters();
 	}
 	
-	public void setMemoryCells(int[] cells){
-		memoryCells = new int[cells.length];
-		for(int i = 0; i < cells.length; i++){
-			memoryCells[i] = cells[i];
-		}
+	public void setMemoryCells(){
 		rmPanel.setMemoryCells();
 	}
 	
 	public void updateValues(int reg, int source, byte mode){
 		rmPanel.updateValues(reg, source, mode);
+	}
+	
+	public void updateRegister(int index){
+		rmPanel.updateRegister(index);
 	}
 }

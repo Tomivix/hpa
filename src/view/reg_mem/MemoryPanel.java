@@ -7,6 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import core.Engine;
 import view.View;
 
 import static javax.swing.SpringLayout.*;
@@ -30,8 +31,8 @@ public class MemoryPanel extends JPanel{
 	}
 	
 	public void setMemoryCells() {
-		this.memoryCells = new MemoryCell[View.memoryCells.length];
-		for(int i = 0; i < View.memoryCells.length; i++){
+		this.memoryCells = new MemoryCell[Engine.current.getVarCount()];
+		for(int i = 0; i < Engine.current.getVarCount(); i++){
 			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", i);
 		}
 		for(int i = 0; i < memoryCells.length; i++){
@@ -49,7 +50,7 @@ public class MemoryPanel extends JPanel{
 	}
 	
 	public void recalculateCellsPosition(){
-		for(int i = 0; i < View.memoryCells.length; i++){
+		for(int i = 0; i < Engine.current.getVarCount(); i++){
 			MemoryCell memCell = memoryCells[i];
 			memCell.setTopX(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT));
 			memCell.setTopY((int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT);

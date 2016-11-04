@@ -2,7 +2,7 @@ package view.reg_mem;
 
 import java.awt.event.MouseEvent;
 
-import view.View;
+import core.Engine;
 
 public class RegisterCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
@@ -16,7 +16,7 @@ public class RegisterCell extends EditableCell {
 	
 	@Override
 	protected int getValue() {
-		return View.registers[index];
+		return Engine.current.getReg(index);
 	}
 
 	@Override

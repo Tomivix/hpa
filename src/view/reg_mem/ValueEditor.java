@@ -13,6 +13,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import core.Engine;
 import view.View;
 
 import static javax.swing.SpringLayout.*;
@@ -162,9 +163,9 @@ public class ValueEditor {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(isRegister){
-					View.registers[index] = Integer.parseInt(textFields[1].getText());
+					Engine.current.setReg(index, Integer.parseInt(textFields[1].getText()));
 				}else{
-					View.memoryCells[index] = Integer.parseInt(textFields[1].getText()); //FIXME Engine's set method should call updateValue on corresponding EditableCell
+					Engine.current.setVar(index, Integer.parseInt(textFields[1].getText()));
 				}
 				valueFrame.dispose();
 			}
@@ -185,7 +186,7 @@ public class ValueEditor {
 		layout.putConstraint(SOUTH, cancelButton, -VERT_PAD, SOUTH, valueFrame.getContentPane());
 		layout.putConstraint(HORIZONTAL_CENTER, cancelButton, DIALOG_WIDTH*3/4, WEST, valueFrame.getContentPane());
 		
-		decTextField.setText((isRegister ? View.registers[index] : View.memoryCells[index]) + "");
+		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVar(index)) + "");
 		
 		valueFrame.setModalityType(ModalityType.APPLICATION_MODAL);
 		valueFrame.setTitle(title);
@@ -197,21 +198,21 @@ public class ValueEditor {
 	}
 	
 	protected static void recalculateFields(int originIndex){ //TODO: Allow to input only valid numbers
-		System.out.println("Recalculating from: " + originIndex);
+		String s = textFields[originIndex].getText().length() == 0 ? "0" : textFields[originIndex].getText();;
 		int i;
 		switch(originIndex){
 		case 0:
-			i = Integer.parseInt(textFields[0].getText(), 2);
+			i = Integer.parseInt(s, 2);
 			textFields[1].setText(i + "");
 			textFields[2].setText(Integer.toHexString(i));
 			break;
 		case 1:
-			i = Integer.parseInt(textFields[1].getText());
+			i = Integer.parseInt(s);
 			textFields[0].setText(Integer.toBinaryString(i));
 			textFields[2].setText(Integer.toHexString(i));
 			break;
 		case 2:
-			i = Integer.parseInt(textFields[2].getText(), 16);
+			i = Integer.parseInt(s, 16);
 			textFields[0].setText(Integer.toBinaryString(i));
 			textFields[1].setText(i + "");
 			break;
