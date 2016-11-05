@@ -21,7 +21,7 @@ public class View {
 	
 	public static View Instance;
 	
-	public final static int FRAME_WIDTH = 1070, FRAME_HEIGHT = 730;
+	public final static int FRAME_WIDTH = 1070, FRAME_HEIGHT = 760;
 	public final static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
 	public final static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public final static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
