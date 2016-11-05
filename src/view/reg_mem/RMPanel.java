@@ -47,7 +47,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 
 	public void setRegisters() {
 		registerPanel.setRegisters();
-		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT+View.LABEL_DOWN_PAD, NORTH, registerPanel);
+		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
 	

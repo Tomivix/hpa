@@ -256,7 +256,6 @@ public class ValueEditor {
 	}
 	
 	public static void focusDecField(){
-		System.out.println("Focusing");
 		decTextField.requestFocus();
 		decTextField.selectAll();
 	}
