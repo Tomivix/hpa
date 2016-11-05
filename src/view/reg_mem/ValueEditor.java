@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
 
 import core.Engine;
 
@@ -23,6 +24,8 @@ public class ValueEditor {
 	
 	private static JTextField[] textFields; //0 - binary, 1 - decimal, 2 - hexadecimal
 	private static boolean userModified = false;
+	private static JButton acceptButton;
+	private static JTextField decTextField;
 	
 	static{
 		textFields = new JTextField[3];
@@ -65,7 +68,10 @@ public class ValueEditor {
 		
 		JTextField binTextField = new JTextField();
 		textFields[0] = binTextField;
-		binTextField.getDocument().addDocumentListener(new DocumentListener() {
+		AbstractDocument binDocument = new RestrictedInputDocument(new char[]{
+				'0', '1'
+		});
+		binDocument.addDocumentListener(new DocumentListener() {
 			
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -89,14 +95,18 @@ public class ValueEditor {
 				}
 			}
 		});
+		binTextField.setDocument(binDocument);
 		valueFrame.add(binTextField);
 		layout.putConstraint(VERTICAL_CENTER, binTextField, 0, VERTICAL_CENTER, binLabel);
 		layout.putConstraint(EAST, binTextField, -HORIZON_PAD, EAST, valueFrame.getContentPane());
 		layout.putConstraint(WEST, binTextField, westConstr + HORIZON_PAD*2, WEST, valueFrame.getContentPane());
 		
-		JTextField decTextField = new JTextField();
+		decTextField = new JTextField();
 		textFields[1] = decTextField;
-		decTextField.getDocument().addDocumentListener(new DocumentListener() {
+		AbstractDocument decDocument = new RestrictedInputDocument(new char[]{
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+		});
+		decDocument.addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -120,6 +130,7 @@ public class ValueEditor {
 				}
 			}
 		});
+		decTextField.setDocument(decDocument);
 		valueFrame.add(decTextField);
 		layout.putConstraint(VERTICAL_CENTER, decTextField, 0, VERTICAL_CENTER, decLabel);
 		layout.putConstraint(EAST, decTextField, -HORIZON_PAD, EAST, valueFrame.getContentPane());
@@ -127,7 +138,10 @@ public class ValueEditor {
 		
 		JTextField hexTextField = new JTextField();
 		textFields[2] = hexTextField;
-		hexTextField.getDocument().addDocumentListener(new DocumentListener() {
+		AbstractDocument hexDocument = new RestrictedInputDocument(new char[]{
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+		});
+		hexDocument.addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -151,12 +165,13 @@ public class ValueEditor {
 				}
 			}
 		});
+		hexTextField.setDocument(hexDocument);
 		valueFrame.add(hexTextField);
 		layout.putConstraint(VERTICAL_CENTER, hexTextField, 0, VERTICAL_CENTER, hexLabel);
 		layout.putConstraint(EAST, hexTextField, -HORIZON_PAD, EAST, valueFrame.getContentPane());
 		layout.putConstraint(WEST, hexTextField, westConstr + HORIZON_PAD*2, WEST, valueFrame.getContentPane());
 		
-		JButton acceptButton = new JButton("Accept");
+		acceptButton = new JButton("Accept");
 		acceptButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -187,13 +202,16 @@ public class ValueEditor {
 		
 		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVar(index)) + "");
 		
-		valueFrame.setModalityType(ModalityType.APPLICATION_MODAL);
 		valueFrame.setTitle(title);
 		Dimension minSize = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);
 		valueFrame.setMinimumSize(minSize);
 		valueFrame.setSize(minSize);
 		valueFrame.setLocationRelativeTo(null);
 		valueFrame.setVisible(true);
+		focusDecField();
+		valueFrame.setModalityType(ModalityType.APPLICATION_MODAL);
+		valueFrame.setVisible(false);
+		valueFrame.setVisible(true); //FIXME Works for now, but it doesn't look right hiding and showing a window
 	}
 	
 	protected static void recalculateFields(int originIndex){ //TODO: Allow to input only valid numbers
@@ -201,21 +219,45 @@ public class ValueEditor {
 		int i;
 		switch(originIndex){
 		case 0:
-			i = Integer.parseInt(s, 2);
+			try{
+				i = Integer.parseInt(s, 2);
+				acceptButton.setEnabled(true);
+			}catch(NumberFormatException e){
+				acceptButton.setEnabled(false);
+				i = 0;
+			}
 			textFields[1].setText(i + "");
 			textFields[2].setText(Integer.toHexString(i));
 			break;
 		case 1:
-			i = Integer.parseInt(s);
+			try{
+				i = Integer.parseInt(s);
+				acceptButton.setEnabled(true);
+			}catch(NumberFormatException e){
+				i = 0;
+				acceptButton.setEnabled(false);
+			}
 			textFields[0].setText(Integer.toBinaryString(i));
 			textFields[2].setText(Integer.toHexString(i));
 			break;
 		case 2:
-			i = Integer.parseInt(s, 16);
+			try{
+				i = Integer.parseInt(s, 16);
+				acceptButton.setEnabled(true);
+			}catch(NumberFormatException e){
+				i = 0;
+				acceptButton.setEnabled(false);
+			}
 			textFields[0].setText(Integer.toBinaryString(i));
 			textFields[1].setText(i + "");
 			break;
 		}
 		userModified = false;
+	}
+	
+	public static void focusDecField(){
+		System.out.println("Focusing");
+		decTextField.requestFocus();
+		decTextField.selectAll();
 	}
 }
