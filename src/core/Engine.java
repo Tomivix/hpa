@@ -1,6 +1,7 @@
 package core;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.SwingUtilities;
@@ -107,9 +108,23 @@ public class Engine {
 		return regs.length;
 	}
 	
+	public void addVar(String label, int value){
+		varLabels.put(label, lastVar);
+		addVar(value);
+	}
+	
 	public void addVar(int value){
 		vars.put(lastVar, value);
 		lastVar += 4;
+	}
+	
+	public Map<Integer, Integer> getAllVars(){
+		return vars;
+	}
+	
+	public int getVar(String label){
+		int id = varLabels.get(label);
+		return getVar(id);
 	}
 	
 	public int getVar(int id){
@@ -146,7 +161,52 @@ public class Engine {
 		
 	private abstract class Function {
 		public abstract void execute(int arg1, int arg2);
-	}	
+	}
+	
+	private void buildVariables(String code){
+		String[] lines = code.split("\n");
+		for(String line : lines){
+			int type = Parser.parse(line, true);
+			if(type == 4 || type == 5){
+				//remove all white spaces
+				line = line.replaceAll("\\s+", "");
+				
+				//set basic values;
+				int count = 1;
+				int value = new Random().nextInt();
+				
+				//get label
+				String label = line.substring(0, line.indexOf(':'));
+				
+				//check if is more than one 
+				int c2 = line.indexOf('*');
+				if(c2>0){
+					String dir = (type == 4) ? "DC" : "DS";
+					int c1 = line.indexOf(dir);
+					String countS = line.substring(c1+2, c2);
+					count = Integer.parseInt(countS);
+				}
+				
+				//check if value is known
+				int v1 = line.indexOf('(');
+				int v2 = line.indexOf(')');
+				if(v1+v1 > 0){
+					String valueS = line.substring(v1+1, v2);
+					value = Integer.parseInt(valueS);
+				}
+				
+				addVar(label, value);
+				for(int i=1; i<count; i++) addVar(value);
+				
+				System.out.println(vars);
+				
+			}
+		}
+		
+		
+		
+		
+	}
 	
 	private void createFunctions(){
 		
@@ -238,21 +298,22 @@ public class Engine {
 		
 		functions.put("DC", new Function(){
 			public void execute(int arg1, int arg2){
-				for(int i=0; i<arg1; i++) addVar(arg2);
+				for(int i=0; i<arg1; i++) addVar("label", arg2);
 			}
 		});
 		
 		functions.put("DS", new Function(){
 			public void execute(int arg1, int arg2){
 				for(int i=0; i<arg1; i++)
-					addVar((new Random()).nextInt());
+					addVar("label", new Random().nextInt());
 			}
 		});		
 	}
 	
 	public void buildDirectivesFromString(String s){
 		//TODO
-		System.out.println(s);
+		//System.out.println(s);
+		buildVariables(s);
 		
 		View.Instance.setRegisters();	//Needed to coorectly display graphics
 		View.Instance.setMemoryCells();

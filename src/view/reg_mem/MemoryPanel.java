@@ -1,6 +1,7 @@
 package view.reg_mem;
 
 import java.awt.Point;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -32,9 +33,22 @@ public class MemoryPanel extends JPanel{
 	
 	public void setMemoryCells() {
 		this.memoryCells = new MemoryCell[Engine.current.getVarCount()];
-		for(int i = 0; i < Engine.current.getVarCount(); i++){
-			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", i);
+		
+		
+		/*
+		for(Map.Entry<Integer, Integer> entry : Engine.current.getAllVars().entrySet()){
+			int index = entry.getKey();
+			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", index);
+			i++;
 		}
+		*/
+		
+		
+		for(int i = 0; i < Engine.current.getVarCount(); i++){
+			int index = 1024 + i*4;
+			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", index);
+		}
+		
 		for(int i = 0; i < memoryCells.length; i++){
 			MemoryCell memCell = memoryCells[i];
 			super.add(memCell);
