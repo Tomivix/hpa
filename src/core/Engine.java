@@ -3,6 +3,8 @@ package core;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 
@@ -24,6 +26,7 @@ public class Engine {
 	public static final int DC = 4;
 	public static final int DS = 5;
 	
+	//@wasp I need following arrays :)
 	// HEAD //
 	
 	private final String[] cmdRR = {
@@ -31,25 +34,26 @@ public class Engine {
 	};
 		
 	private final String[] cmdRM = {
-			"ST", "A", "S", "M", "D", "C", "L", "LA", 
+			"A", "S", "M", "D", "C", "L", "LA", "ST"
 	};
 		
 	private final String[] cmdJ = {
-				"JN", "JP", "JZ", "J"
+			"J", "JN", "JP", "JZ",
 	};
 		
 	private final String[] cmdM = {
-				"DC", "DS"
+			"DC", "DS"
 	};
 		
-	private final String[][] cmds = {
-				cmdRR, cmdRM, cmdJ, cmdM
+	private final String[][] commands = {
+				cmdRR, cmdRM, cmdJ,
 	};
 	
 	// TAIL // <-- what are all those arrays for?
 	
 	//all the rest
 	
+	//@mrwasp It's temporary or we really will use Singletons like this or View.Instance?
 	public static Engine current;
 	
 	private HashMap<Integer, String> orders;
@@ -117,10 +121,6 @@ public class Engine {
 		lastVar += 4;
 	}
 	
-	public Map<Integer, Integer> getAllVars(){
-		return vars;
-	}
-	
 	public int getVar(String label){
 		int id = varLabels.get(label);
 		return getVar(id);
@@ -165,9 +165,6 @@ public class Engine {
 	
 	
 	private abstract class Function {
-		private int type;
-		
-		
 		public abstract void execute(int arg1, int arg2);
 	}
 	
@@ -232,32 +229,23 @@ public class Engine {
 		
 		// jump functions -------------------------------------------//
 		
-		// TODO come up with some bulk function for all types of jumps
-		
-		functions.put("J", new Function(){
-			public void execute(int arg1, int arg2){
-				setCurrentOrder(arg1);
+		for(final String cmd : cmdJ){
+			functions.put(cmd, new Function(){
+				public void execute(int arg1, int arg2){
+				switch(cmd){
+					case "J": setCurrentOrder(arg1); break;
+					case "JP": if(getFlag() == POSITIVE) setCurrentOrder(arg1); break;
+					case "JN": if(getFlag() == NEGATIVE) setCurrentOrder(arg1); break;
+					case "JZ": if(getFlag() == ZERO) setCurrentOrder(arg1); break;
+				
+				}
+				
 			}
 		});
+		}
 		
-		functions.put("JN", new Function(){
-			public void execute(int arg1, int arg2){
-				if(getFlag() == NEGATIVE) setCurrentOrder(arg1);
-			}
-		});
-		
-		functions.put("JP", new Function(){
-			public void execute(int arg1, int arg2){
-				if(getFlag() == POSITIVE) setCurrentOrder(arg1);
-			}
-		});
-		
-		functions.put("JZ", new Function(){
-			public void execute(int arg1, int arg2){
-				if(getFlag() == ZERO) setCurrentOrder(arg1);
-			}
-		});		
-		
+		//@mrwasp
+		//it seems following functions are unnecessary since we add variables by #buildDirectivesFromString
 		// memory functions -------------------------------------------//
 		
 		functions.put("DC", new Function(){
@@ -274,6 +262,8 @@ public class Engine {
 		});		
 	}
 	
+	//@mrwasp
+	//maybe we should use separate function for clearing datas?
 	public void buildDirectivesFromString(String s){
 		lastVar = 1024;
 		vars.clear();
@@ -317,112 +307,124 @@ public class Engine {
 		System.out.println(vars);
 		System.out.println(varLabels);
 		
+		//FIXME GUI - memory cells doesn't refresh automatically
 		View.Instance.setRegisters();	//Needed to coorectly display graphics
 		View.Instance.setMemoryCells();
 	}
 	
+	//@mrwasp
 	public void buildOrdersFromString(String s){
-		lastOrder = 2048;
+		lastOrder = currentOrder = 2048;
 		orders.clear();
 		orderLabels.clear();
 		String[] lines = s.split("\n");
 		for(String line : lines){
 			int type = Parser.parse(line, false);
 			if(type != 0){
-				//remove all white spaces
-				line = line.replaceAll("\\s+", "");
-				
-				//set basic values;
-				int count = 1;
-				int value = new Random().nextInt();
-				
-				//get label and order
+				//split into label and order
 				int parser = line.indexOf(':');
 				String label = (parser < 0) ? null : line.substring(0, parser);
 				String order = line.substring(parser+1);
 				
+				
+				//clear label
+				if(label!=null)label = label.replaceAll("\\s+", "");
+				
+				//clear order - syntax "ORDER*ARGUMENTS"
+				//any ideas how to do it easier?
+				Pattern orderPattern = Pattern.compile("AR|SR|MR|DR|CR|LR|A|S|M|D|C|L|LA|ST|J|JN|JP|JZ");
+				Matcher matcher = orderPattern.matcher(order);
+				if(matcher.find()){
+					int start = matcher.start();
+					int end = order.indexOf(" ", start);
+					String order1 = order.substring(start, end);
+					String order2 = order.substring(end);
+					order2 = order2.replaceAll("\\s+", "");
+					order = order1 + "*" + order2;
+				}
+			
 				//size depending on type
 				int size = (type == JUMP) ? 2 : 4;
+				
 				addOrder(label, order, size);
 			}
 		}
 		System.out.println(orders);
 		System.out.println(orderLabels);
+		
+		//FIXME GUI - memory cells doesn't store orders
 	}
 	
+	//@mrwasp
 	public void run(){
-		for(int i=currentOrder; i<lastOrder;) step();
+		while(currentOrder < lastOrder){
+			step();
+			try { Thread.sleep(1000);}
+			catch(InterruptedException ex) { Thread.currentThread().interrupt();}
+		}
 	}
 	
+	
+	//@mrwasp
 	public void step(){
-		//TODO
-		System.out.println(currentOrder);
-		if(currentOrder < lastOrder){
-			myStep();
-			for(int reg : regs) System.out.print(reg + " ");
-			System.out.print("  -flag= " + flag);
-			System.out.println();
-		
-			View.Instance.setRegisters();
-			View.Instance.setMemoryCells();
+		/**/System.out.println(currentOrder);
+		if(currentOrder >= lastOrder){
+			System.out.println("end of orders");
+			return;
 		}
-		else System.out.println("end of orders");
 		
+		String order = orders.get(currentOrder);
+		/**/ System.out.println(order);
+		int end =  order.indexOf('*');
+		String command = order.substring(0, end);
+		String args = order.substring(end+1);
+		
+		for(String cmd : cmdJ){
+			if(command.equals(cmd)){
+				int actualOrder = currentOrder;
+				int arg1 = orderLabels.get(args);
+				functions.get(cmd).execute(arg1, 0);
+				if(actualOrder == currentOrder)currentOrder += 2;
+			}
+		}
+		
+		for(String cmd : cmdRR){
+			if(command.equals(cmd)){
+				int p = args.indexOf(',');
+				int arg1 = Integer.parseInt( args.substring(0, p) );
+				int arg2 = Integer.parseInt( args.substring(p+1) );
+				functions.get(cmd).execute(arg1, arg2);
+				currentOrder += 4;
+			}
+		}
+		
+		for(String cmd : cmdRM){
+			if(command.equals(cmd)){
+				int p = args.indexOf(',');
+				int arg1 = Integer.parseInt( args.substring(0, p) );
+				int arg2 = varLabels.get( args.substring(p+1) );
+				functions.get(cmd).execute(arg1, arg2);
+				currentOrder += 4;
+			}
+		}
+		
+		/*prints for debugging*/
+		for(int reg : regs) System.out.print(reg + " ");
+		System.out.print("  flag= " + flag);
+		System.out.println();
+		/**/
+		
+		View.Instance.setRegisters();
+		View.Instance.setMemoryCells();
+		
+		//@mrwasp Not sure how exactly it should works
+		//TODO
 		//Set the arrow pointing on register and memory panel 
 		//View.Instance.updateValues(<last_modified_source>, <last_modified_destination>, <MODE>);
 		//MODE:
 		//		-View.RM (Register -> Memory cell)
 		//		-View.RR (Register -> Register)
 		//		-View.MR (Memory cell -> Register)
-	}
-	
-	
-	public void myStep(){
-		String order = orders.get(currentOrder);
-		/**/ System.out.println(order);
-		String command = order.substring(0, 2);
-		for(String cmd : cmdJ){
-			if(command.contains(cmd)){
-				int actualOrder = currentOrder;
-				int beginId = order.indexOf(cmd) + cmd.length();
-				String label = order.substring(beginId);
-				int arg1 = orderLabels.get(label);
-				functions.get(cmd).execute(arg1, 0);
-				if(actualOrder == currentOrder)currentOrder += 2;
-				return;
-			}
-		}
-		
-		for(String cmd : cmdRR){
-			if(command.contains(cmd)){
-				int beginId = order.indexOf(cmd) + cmd.length();
-				String args = order.substring(beginId);
-				int parser = args.indexOf(',');
-				String arg1S = args.substring(0, parser);
-				String arg2S = args.substring(parser+1);
-				int arg1 = Integer.parseInt(arg1S);
-				int arg2 = Integer.parseInt(arg2S);
-				functions.get(cmd).execute(arg1, arg2);
-				currentOrder += 4;
-				return;
-			}
-		}
-		
-		for(String cmd : cmdRM){
-			if(command.contains(cmd)){
-				int beginId = order.indexOf(cmd) + cmd.length();
-				String args = order.substring(beginId);
-				int parser = args.indexOf(',');
-				String arg1S = args.substring(0, parser);
-				String arg2S = args.substring(parser+1);
-				int arg1 = Integer.parseInt(arg1S);
-				System.out.println(arg2S);
-				int arg2 = varLabels.get(arg2S);
-				functions.get(cmd).execute(arg1, arg2);
-				currentOrder += 4;
-				return;
-			}
-		}
 	}
 	
 }
