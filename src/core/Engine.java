@@ -16,6 +16,14 @@ public class Engine {
 	public static final byte NEGATIVE = 2;
 	public static final byte ERROR = 3;
 	
+	
+	//@wasp const types because I'm getting lost
+	public static final int RR = 1;
+	public static final int RM = 2;
+	public static final int JUMP = 3;
+	public static final int DC = 4;
+	public static final int DS = 5;
+	
 	// HEAD //
 	
 	private final String[] cmdRR = {
@@ -23,18 +31,18 @@ public class Engine {
 	};
 		
 	private final String[] cmdRM = {
-			"A", "S", "M", "D", "C", "L", "LA", "ST"
+			"ST", "A", "S", "M", "D", "C", "L", "LA", 
 	};
 		
 	private final String[] cmdJ = {
-				"J", "JN", "JP", "JZ"
+				"JN", "JP", "JZ", "J"
 	};
 		
 	private final String[] cmdM = {
 				"DC", "DS"
 	};
 		
-	private final String[][] commands = {
+	private final String[][] cmds = {
 				cmdRR, cmdRM, cmdJ, cmdM
 	};
 	
@@ -86,15 +94,6 @@ public class Engine {
 		});
 	}
 	
-	public String debug(){
-		addOrder("LS", 2);
-		addOrder("CD", 4);
-		addOrder("A", 4);
-		addOrder("Siea", 2);
-		addOrder("YOYO", 4);
-		return orders.toString() + lastOrder;
-	}	
-	
 	public int getReg(int id){
 		return regs[id];
 	}
@@ -133,17 +132,18 @@ public class Engine {
 	
 	public void setVar(int id, int value){
 		vars.replace(id, value);
-		View.Instance.updateMemCell(id/4);
+		View.Instance.updateMemCell((id-1024)/4);
 	}
 	
 	public int getVarCount(){
 		return vars.size();
 	}
 	
-	public void addOrder(String order, int size){
+	public void addOrder(String label, String order, int size){
+		if(label != null) orderLabels.put(label, lastOrder);
 		orders.put(lastOrder, order);
 		lastOrder += size;
-	}	
+	}
 	
 	public void setCurrentOrder(int id){
 		this.currentOrder = id;
@@ -159,54 +159,18 @@ public class Engine {
 		else flag = ZERO;
 	}
 		
+
+	
+	
+	
+	
 	private abstract class Function {
+		private int type;
+		
+		
 		public abstract void execute(int arg1, int arg2);
 	}
 	
-	private void buildVariables(String code){
-		String[] lines = code.split("\n");
-		for(String line : lines){
-			int type = Parser.parse(line, true);
-			if(type == 4 || type == 5){
-				//remove all white spaces
-				line = line.replaceAll("\\s+", "");
-				
-				//set basic values;
-				int count = 1;
-				int value = new Random().nextInt();
-				
-				//get label
-				String label = line.substring(0, line.indexOf(':'));
-				
-				//check if is more than one 
-				int c2 = line.indexOf('*');
-				if(c2>0){
-					String dir = (type == 4) ? "DC" : "DS";
-					int c1 = line.indexOf(dir);
-					String countS = line.substring(c1+2, c2);
-					count = Integer.parseInt(countS);
-				}
-				
-				//check if value is known
-				int v1 = line.indexOf('(');
-				int v2 = line.indexOf(')');
-				if(v1+v1 > 0){
-					String valueS = line.substring(v1+1, v2);
-					value = Integer.parseInt(valueS);
-				}
-				
-				addVar(label, value);
-				for(int i=1; i<count; i++) addVar(value);
-				
-				System.out.println(vars);
-				
-			}
-		}
-		
-		
-		
-		
-	}
 	
 	private void createFunctions(){
 		
@@ -311,26 +275,98 @@ public class Engine {
 	}
 	
 	public void buildDirectivesFromString(String s){
-		//TODO
-		//System.out.println(s);
-		buildVariables(s);
+		lastVar = 1024;
+		vars.clear();
+		varLabels.clear();
+		String[] lines = s.split("\n");
+		for(String line : lines){
+			int type = Parser.parse(line, true);
+			if(type != 0){
+				//remove all white spaces
+				line = line.replaceAll("\\s+", "");
+				
+				//set basic values;
+				int count = 1;
+				int value = new Random().nextInt();
+				
+				//get label
+				String label = line.substring(0, line.indexOf(':'));
+				
+				//check if is more than one 
+				int c2 = line.indexOf('*');
+				if(c2>0){
+					String dir = (type == DC) ? "DC" : "DS";
+					int c1 = line.indexOf(dir);
+					String countS = line.substring(c1+2, c2);
+					count = Integer.parseInt(countS);
+				}
+				
+				//check if value is known
+				int v1 = line.indexOf('(');
+				int v2 = line.indexOf(')');
+				if(v1 > 0){
+					String valueS = line.substring(v1+1, v2);
+					value = Integer.parseInt(valueS);
+				}
+				
+				addVar(label, value);
+				for(int i=1; i<count; i++) addVar(value);
+				
+			}
+		}
+		System.out.println(vars);
+		System.out.println(varLabels);
 		
 		View.Instance.setRegisters();	//Needed to coorectly display graphics
 		View.Instance.setMemoryCells();
 	}
 	
 	public void buildOrdersFromString(String s){
-		//TODO
-		System.out.println(s);
+		lastOrder = 2048;
+		orders.clear();
+		orderLabels.clear();
+		String[] lines = s.split("\n");
+		for(String line : lines){
+			int type = Parser.parse(line, false);
+			if(type != 0){
+				//remove all white spaces
+				line = line.replaceAll("\\s+", "");
+				
+				//set basic values;
+				int count = 1;
+				int value = new Random().nextInt();
+				
+				//get label and order
+				int parser = line.indexOf(':');
+				String label = (parser < 0) ? null : line.substring(0, parser);
+				String order = line.substring(parser+1);
+				
+				//size depending on type
+				int size = (type == JUMP) ? 2 : 4;
+				addOrder(label, order, size);
+			}
+		}
+		System.out.println(orders);
+		System.out.println(orderLabels);
 	}
 	
 	public void run(){
-		//TODO
-		//Probably will run step every few seconds
+		for(int i=currentOrder; i<lastOrder;) step();
 	}
 	
 	public void step(){
 		//TODO
+		System.out.println(currentOrder);
+		if(currentOrder < lastOrder){
+			myStep();
+			for(int reg : regs) System.out.print(reg + " ");
+			System.out.print("  -flag= " + flag);
+			System.out.println();
+		
+			View.Instance.setRegisters();
+			View.Instance.setMemoryCells();
+		}
+		else System.out.println("end of orders");
 		
 		//Set the arrow pointing on register and memory panel 
 		//View.Instance.updateValues(<last_modified_source>, <last_modified_destination>, <MODE>);
@@ -339,4 +375,54 @@ public class Engine {
 		//		-View.RR (Register -> Register)
 		//		-View.MR (Memory cell -> Register)
 	}
+	
+	
+	public void myStep(){
+		String order = orders.get(currentOrder);
+		/**/ System.out.println(order);
+		String command = order.substring(0, 2);
+		for(String cmd : cmdJ){
+			if(command.contains(cmd)){
+				int actualOrder = currentOrder;
+				int beginId = order.indexOf(cmd) + cmd.length();
+				String label = order.substring(beginId);
+				int arg1 = orderLabels.get(label);
+				functions.get(cmd).execute(arg1, 0);
+				if(actualOrder == currentOrder)currentOrder += 2;
+				return;
+			}
+		}
+		
+		for(String cmd : cmdRR){
+			if(command.contains(cmd)){
+				int beginId = order.indexOf(cmd) + cmd.length();
+				String args = order.substring(beginId);
+				int parser = args.indexOf(',');
+				String arg1S = args.substring(0, parser);
+				String arg2S = args.substring(parser+1);
+				int arg1 = Integer.parseInt(arg1S);
+				int arg2 = Integer.parseInt(arg2S);
+				functions.get(cmd).execute(arg1, arg2);
+				currentOrder += 4;
+				return;
+			}
+		}
+		
+		for(String cmd : cmdRM){
+			if(command.contains(cmd)){
+				int beginId = order.indexOf(cmd) + cmd.length();
+				String args = order.substring(beginId);
+				int parser = args.indexOf(',');
+				String arg1S = args.substring(0, parser);
+				String arg2S = args.substring(parser+1);
+				int arg1 = Integer.parseInt(arg1S);
+				System.out.println(arg2S);
+				int arg2 = varLabels.get(arg2S);
+				functions.get(cmd).execute(arg1, arg2);
+				currentOrder += 4;
+				return;
+			}
+		}
+	}
+	
 }
