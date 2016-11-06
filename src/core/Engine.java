@@ -282,38 +282,31 @@ public class Engine implements ActionListener {
 		varLabels.clear();
 		String[] lines = s.split("\n");
 		for(String line : lines){
-			int type = Parser.parse(line, true);
-			if(type != 0){
-				//remove all white spaces
-				line = line.replaceAll("\\s+", "");
+			int res[][] = Parser.getPos(line, true);
+			
+			if(res[1][0] < 0){
+				//probably unnecessary if we block build when there are some errors in code
+				System.out.println(line);
+				System.out.println("error, incorrect command");
+			}
+			else{
+				String label = line.substring(res[0][0], res[0][1] +1);
+				String dir = line.substring(res[1][0], res[1][1] +1);
+				String arg1 = (res[2][0] < 0) ? null : line.substring(res[2][0], res[2][1] +1);
+				String arg2 = (res[3][0] < 0) ? null : line.substring(res[3][0], res[3][1] +1);
+
+				int count = (arg1==null) ? 1 : Integer.parseInt(arg1);
+				int value = (arg2==null) ? 0 : Integer.parseInt(arg2);
 				
-				//set basic values;
-				int count = 1;
-				int value = new Random().nextInt();
-				
-				//get label
-				String label = line.substring(0, line.indexOf(':'));
-				
-				//check if is more than one 
-				int c2 = line.indexOf('*');
-				if(c2>0){
-					String dir = (type == DC) ? "DC" : "DS";
-					int c1 = line.indexOf(dir);
-					String countS = line.substring(c1+2, c2);
-					count = Integer.parseInt(countS);
+				if(arg2==null){
+					Random r = new Random();
+					addVar(label, r.nextInt(2000)-1000);
+					for(int i=1; i<count; i++) addVar(r.nextInt(2000)-1000);
 				}
-				
-				//check if value is known
-				int v1 = line.indexOf('(');
-				int v2 = line.indexOf(')');
-				if(v1 > 0){
-					String valueS = line.substring(v1+1, v2);
-					value = Integer.parseInt(valueS);
+				else{
+					addVar(label, value);
+					for(int i=1; i<count; i++) addVar(value);
 				}
-				
-				addVar(label, value);
-				for(int i=1; i<count; i++) addVar(value);
-				
 			}
 		}
 		System.out.println(vars);
@@ -331,33 +324,18 @@ public class Engine implements ActionListener {
 		orderLabels.clear();
 		String[] lines = s.split("\n");
 		for(String line : lines){
-			int type = Parser.parse(line, false);
-			if(type != 0){
-				//split into label and order
-				int parser = line.indexOf(':');
-				String label = (parser < 0) ? null : line.substring(0, parser);
-				String order = line.substring(parser+1);
-				
-				
-				//clear label
-				if(label!=null)label = label.replaceAll("\\s+", "");
-				
-				//clear order - syntax "ORDER*ARGUMENTS"
-				//any ideas how to do it easier?
-				Pattern orderPattern = Pattern.compile("AR|SR|MR|DR|CR|LR|A|S|M|D|C|L|LA|ST|J|JN|JP|JZ");
-				Matcher matcher = orderPattern.matcher(order);
-				if(matcher.find()){
-					int start = matcher.start();
-					int end = order.indexOf(" ", start);
-					String order1 = order.substring(start, end);
-					String order2 = order.substring(end);
-					order2 = order2.replaceAll("\\s+", "");
-					order = order1 + "*" + order2;
-				}
+			int res[][] = Parser.getPos(line, false);
 			
-				//size depending on type
-				int size = (type == JUMP) ? 2 : 4;
+			if(res[1][0] < 0){
+				//probably unnecessary if we block build when there are some errors in code
+				System.out.println(line);
+				System.out.println("error, incorrect command");
+			}
+			else{
+				String label = (res[0][0] < 0) ? null : line.substring(res[0][0], res[0][1] +1);
+				String order = line.substring(res[1][0]);
 				
+				int size = (Parser.parse(line, false) == JUMP) ? 2 : 4;
 				addOrder(label, order, size);
 			}
 		}
@@ -376,7 +354,7 @@ public class Engine implements ActionListener {
 	
 	//@mrwasp
 	public void step(){
-		/**/System.out.println(currentOrder);
+		/**/System.out.print(currentOrder + " - ");
 		if(currentOrder >= lastOrder){
 			System.out.println("end of orders");
 			return;
@@ -384,56 +362,38 @@ public class Engine implements ActionListener {
 		
 		String order = orders.get(currentOrder);
 		/**/ System.out.println(order);
-		int end =  order.indexOf('*');
-		String command = order.substring(0, end);
-		String args = order.substring(end+1);
 		
-		for(String cmd : cmdJ){
-			if(command.equals(cmd)){
-				int actualOrder = currentOrder;
-				int arg1 = orderLabels.get(args);
-				functions.get(cmd).execute(arg1, 0);
-				if(actualOrder == currentOrder)currentOrder += 2;
+		int res[][] = Parser.getPos(order, false);
+		int type = Parser.parse(order, false);
+		int actualOrder = currentOrder;
+		String command = order.substring(res[1][0], res[1][1] +1);
+		String arg1s = (res[2][0] < 0) ? null :  order.substring(res[2][0], res[2][1] +1);
+		String arg2s = (res[3][0] < 0) ? null :  order.substring(res[3][0], res[3][1] +1);
+		
+		//arg1 = label if JUMP, regId if RR/RM
+		//arg2 = regId if RR, memId if RM, 0 if JUMP
+		//actualOrder - if jump change current order we don't jump to next command
+		
+		int arg1 = (type==JUMP) ? orderLabels.get(arg1s) : Integer.parseInt(arg1s);
+		int arg2 = (type==RR) ? Integer.parseInt(arg2s) : 0;
+		if(type==RM){
+			if(varLabels.containsKey(arg2s)) arg2 = varLabels.get(arg2s);
+			else{
+				int p1 = arg2s.indexOf('(');
+				int p2 = arg2s.indexOf(')');
+				int offset = Integer.parseInt(arg2s.substring(0, p1));
+				int reg = Integer.parseInt(arg2s.substring(p1+1, p2));
+				arg2 = getReg(reg) + offset;
 			}
 		}
 		
-		for(String cmd : cmdRR){
-			if(command.equals(cmd)){
-				int p = args.indexOf(',');
-				int arg1 = Integer.parseInt( args.substring(0, p) );
-				int arg2 = Integer.parseInt( args.substring(p+1) );
-				functions.get(cmd).execute(arg1, arg2);
-				currentOrder += 4;
-			}
-		}
-		
-		for(String cmd : cmdRM){
-			if(command.equals(cmd)){
-				int p = args.indexOf(',');
-				int arg1 = Integer.parseInt( args.substring(0, p) );
-				int arg2 = varLabels.get( args.substring(p+1) );
-				functions.get(cmd).execute(arg1, arg2);
-				currentOrder += 4;
-			}
-		}
-		
+		functions.get(command).execute(arg1, arg2);
+		if(actualOrder == currentOrder) currentOrder += (type==JUMP) ? 2 : 4;
+
 		/*prints for debugging*/
 		for(int reg : regs) System.out.print(reg + " ");
 		System.out.print("  flag= " + flag);
 		System.out.println();
-		/**/
-		
-//		View.Instance.setRegisters();
-//		View.Instance.setMemoryCells();
-		
-		//@mrwasp Not sure how exactly it should works
-		//TODO
-		//Set the arrow pointing on register and memory panel 
-		//View.Instance.updateValues(<last_modified_source>, <last_modified_destination>, <MODE>);
-		//MODE:
-		//		-View.RM (Register -> Memory cell)
-		//		-View.RR (Register -> Register)
-		//		-View.MR (Memory cell -> Register)
 	}
 
 	@Override
