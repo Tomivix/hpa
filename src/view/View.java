@@ -10,6 +10,7 @@ import view.code.CodePanel;
 import view.reg_mem.RMPanel;
 
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
@@ -60,7 +61,7 @@ public class View {
 		});
 		
 		JButton runButton = new JButton("Run");
-		buildButton.addActionListener(new ActionListener() {
+		runButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.run();
@@ -68,7 +69,7 @@ public class View {
 		});
 		
 		JButton stepButton = new JButton("Step");
-		buildButton.addActionListener(new ActionListener() {
+		stepButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.step();
@@ -129,8 +130,15 @@ public class View {
 		rmPanel.setMemoryCells();
 	}
 	
-	public void updateValues(int reg, int source, byte mode){
-		rmPanel.updateValues(reg, source, mode);
+	public void updateValues(final int reg, final int source, final byte mode){
+		EventQueue.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				rmPanel.updateValues(reg, source, mode);
+				
+			}
+		});
 	}
 	
 	public void updateRegister(int index){
@@ -139,5 +147,9 @@ public class View {
 	
 	public void updateMemCell(int index){
 		rmPanel.updateMemCell(index);
+	}
+
+	public void resetLastEdited() {
+		rmPanel.resetLastEdited();
 	}
 }

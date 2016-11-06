@@ -104,7 +104,7 @@ public class ValueEditor {
 		decTextField = new JTextField();
 		textFields[1] = decTextField;
 		AbstractDocument decDocument = new RestrictedInputDocument(new char[]{
-				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-'
 		});
 		decDocument.addDocumentListener(new DocumentListener() {
 
@@ -139,7 +139,7 @@ public class ValueEditor {
 		JTextField hexTextField = new JTextField();
 		textFields[2] = hexTextField;
 		AbstractDocument hexDocument = new RestrictedInputDocument(new char[]{
-				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', '-'
 		});
 		hexDocument.addDocumentListener(new DocumentListener() {
 
@@ -179,7 +179,7 @@ public class ValueEditor {
 				if(isRegister){
 					Engine.current.setReg(index, Integer.parseInt(textFields[1].getText()));
 				}else{
-					Engine.current.setVar(index, Integer.parseInt(textFields[1].getText()));
+					Engine.current.setVar(index*4 + 1024, Integer.parseInt(textFields[1].getText()));
 				}
 				valueFrame.dispose();
 			}
@@ -200,7 +200,7 @@ public class ValueEditor {
 		layout.putConstraint(SOUTH, cancelButton, -VERT_PAD, SOUTH, valueFrame.getContentPane());
 		layout.putConstraint(HORIZONTAL_CENTER, cancelButton, DIALOG_WIDTH*3/4, WEST, valueFrame.getContentPane());
 		
-		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVar(index)) + "");
+		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVarFromAdress(index*4 + 1024)) + "");
 		
 		valueFrame.setTitle(title);
 		Dimension minSize = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);
