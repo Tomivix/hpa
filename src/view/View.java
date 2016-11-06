@@ -60,7 +60,7 @@ public class View {
 		});
 		
 		JButton runButton = new JButton("Run");
-		buildButton.addActionListener(new ActionListener() {
+		runButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.run();
@@ -68,7 +68,7 @@ public class View {
 		});
 		
 		JButton stepButton = new JButton("Step");
-		buildButton.addActionListener(new ActionListener() {
+		stepButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.step();
