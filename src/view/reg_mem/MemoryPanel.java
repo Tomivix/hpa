@@ -31,10 +31,16 @@ public class MemoryPanel extends JPanel{
 	}
 	
 	public void setMemoryCells() {
+		if(memoryCells != null){
+			for(int i = 0; i < memoryCells.length; i++){
+				super.remove(memoryCells[i]);
+			}
+		}
 		this.memoryCells = new MemoryCell[Engine.current.getVarCount()];
 		for(int i = 0; i < Engine.current.getVarCount(); i++){
 			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", i);
 		}
+		
 		for(int i = 0; i < memoryCells.length; i++){
 			MemoryCell memCell = memoryCells[i];
 			super.add(memCell);
@@ -43,10 +49,12 @@ public class MemoryPanel extends JPanel{
 			layout.putConstraint(NORTH, memCell, memCell.getTopY(), NORTH, this);
 			layout.putConstraint(SOUTH, memCell, View.MEM_CELL_HEIGHT, NORTH, memCell);
 		}
+		super.validate();
+		super.repaint();
 	}
 	
-	public Point getRelativeCellLoc(int regIndex){
-		return new Point(memoryCells[regIndex].getTopX()+View.MEM_CELL_WIDTH/2, memoryCells[regIndex].getTopY()+View.MEM_CELL_HEIGHT/2);
+	public Point getRelativeCellLoc(int memCellIndex){
+		return new Point(memoryCells[memCellIndex].getTopX()+View.MEM_CELL_WIDTH/2, memoryCells[memCellIndex].getTopY()+View.MEM_CELL_HEIGHT/2);
 	}
 	
 	public void recalculateCellsPosition(){

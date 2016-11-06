@@ -47,7 +47,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 
 	public void setRegisters() {
 		registerPanel.setRegisters();
-		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT+View.LABEL_DOWN_PAD, NORTH, registerPanel);
+		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
 	
@@ -94,7 +94,7 @@ public class RMPanel extends JPanel implements ComponentListener {
 			break;
 		}
 		
-		if (p1 != null && p6 != null) {
+		if (p1 != null && p6 != null && lastOrderMode != -1) {
 			Point p3 = new Point(layout.getConstraints(registerPanel).getWidth().getValue()+View.REG_MEM_PAD/2, p2.y);
 			Point p4 = new Point(p3.x, p5.y);
 			Graphics2D g2 = (Graphics2D) g;
@@ -148,12 +148,15 @@ public class RMPanel extends JPanel implements ComponentListener {
 		default:
 			lastOrderMode = -1;
 		}
+		
 		if (lr1 != -1)
 			registerPanel.updateRegister(lr1);
 		if (lr2 != -1)
 			registerPanel.updateRegister(lr2);
 		if (lc != -1)
 			memoryPanel.updateCell(lc);
+		
+		repaint();
 	}
 	
 	public void updateRegister(int index){
@@ -192,6 +195,20 @@ public class RMPanel extends JPanel implements ComponentListener {
 		}
 		View.MEM_CELL_COL_COUNT = (int) (Math.floor(layout.getConstraints(memoryPanel).getWidth().getValue()/View.MEM_CELL_WIDTH));
 		memoryPanel.recalculateCellsPosition();
+		repaint();
+	}
+	
+	public void resetLastEdited(){
+		int lr1 = lastReg1;
+		int lr2 = lastReg2;
+		lastOrderMode = -1;
+		lastCell = -1;
+		lastReg1 = -1;
+		lastReg2 = -1;
+		if (lr1 != -1)
+			registerPanel.updateRegister(lr1);
+		if (lr2 != -1)
+			registerPanel.updateRegister(lr2);
 		repaint();
 	}
 }
