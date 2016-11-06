@@ -22,7 +22,7 @@ public class Parser {
 		}
 		return type;
 	}
-		
+	//@param mode: true - directives, false - orders
 	// takes string line and type of command from parse() (subject to change)
 	// returns array res containing start/end index of each part depending on type
 	// (0 - possible label) 1 - command name 2 - first parameter (3 - second parameter)
