@@ -1,5 +1,7 @@
 package core;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -7,10 +9,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import view.View;
+import view.reg_mem.RMPanel;
 
-public class Engine {
+public class Engine implements ActionListener {
 	//const values
 	
 	public static final byte ZERO = 0;
@@ -69,6 +73,8 @@ public class Engine {
 	private int lastOrder;
 	private byte flag;
 	
+	private Timer timer;
+	
 	public Engine(){
 		current = this;
 		orders = new HashMap<>();
@@ -93,7 +99,6 @@ public class Engine {
 			public void run() {
 				View v = new View();
 				v.setRegisters();
-				v.setMemoryCells();
 			}
 		});
 	}
@@ -123,10 +128,10 @@ public class Engine {
 	
 	public int getVar(String label){
 		int id = varLabels.get(label);
-		return getVar(id);
+		return getVarFromAdress(id);
 	}
 	
-	public int getVar(int id){
+	public int getVarFromAdress(int id){
 		return vars.get(id);
 	}
 	
@@ -183,6 +188,7 @@ public class Engine {
 						case "D": reg = getReg(arg1) / getReg(arg2); break;
 						case "C": reg = getReg(arg1) - getReg(arg2); break;
 					} if(!op.equals("C")) setReg(arg1, reg); setFlag(reg);
+					View.Instance.updateValues(arg2, arg1, View.RR);
 				}
 			});
 		}
@@ -190,6 +196,7 @@ public class Engine {
 		functions.put("LR", new Function(){
 			public void execute(int arg1, int arg2){
 				setReg(arg1, getReg(arg2));
+				View.Instance.updateValues(arg2, arg1, View.RR);
 			}
 		});		
 		
@@ -199,31 +206,35 @@ public class Engine {
 			functions.put(op, new Function() {
 				public void execute(int arg1, int arg2) {
 					int reg = 0; switch(op) {
-						case "A": reg = getReg(arg1) + getVar(arg2); break;
-						case "S": reg = getReg(arg1) - getVar(arg2); break;
-						case "M": reg = getReg(arg1) * getVar(arg2); break;
-						case "D": reg = getReg(arg1) / getVar(arg2); break;
-						case "C": reg = getReg(arg1) - getVar(arg2); break;
+						case "A": reg = getReg(arg1) + getVarFromAdress(arg2); break;
+						case "S": reg = getReg(arg1) - getVarFromAdress(arg2); break;
+						case "M": reg = getReg(arg1) * getVarFromAdress(arg2); break;
+						case "D": reg = getReg(arg1) / getVarFromAdress(arg2); break;
+						case "C": reg = getReg(arg1) - getVarFromAdress(arg2); break;
 					} if(!op.equals("C")) setReg(arg1, reg); setFlag(reg);
+					View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
 				}
 			});
 		}
 		
 		functions.put("L", new Function(){
 			public void execute(int arg1, int arg2){
-				setReg(arg1, getVar(arg2));
+				setReg(arg1, getVarFromAdress(arg2));
+				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
 			}
 		});
 		
 		functions.put("LA", new Function(){
 			public void execute(int arg1, int arg2){
 				setReg(arg1, arg2);
+				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
 			}
 		});
 		
 		functions.put("ST", new Function(){
 			public void execute(int arg1, int arg2){
 				setVar(arg2, getReg(arg1));
+				View.Instance.updateValues(arg1, (arg2-1024)/4, View.RM);
 			}
 		});
 		
@@ -266,6 +277,7 @@ public class Engine {
 	//maybe we should use separate function for clearing datas?
 	public void buildDirectivesFromString(String s){
 		lastVar = 1024;
+		View.Instance.resetLastEdited();
 		vars.clear();
 		varLabels.clear();
 		String[] lines = s.split("\n");
@@ -308,7 +320,7 @@ public class Engine {
 		System.out.println(varLabels);
 		
 		//FIXME GUI - memory cells doesn't refresh automatically
-		View.Instance.setRegisters();	//Needed to coorectly display graphics
+		//Needed to coorectly display graphics
 		View.Instance.setMemoryCells();
 	}
 	
@@ -357,11 +369,8 @@ public class Engine {
 	
 	//@mrwasp
 	public void run(){
-		while(currentOrder < lastOrder){
-			step();
-			try { Thread.sleep(1000);}
-			catch(InterruptedException ex) { Thread.currentThread().interrupt();}
-		}
+		timer = new Timer(1000, this);
+		timer.start();
 	}
 	
 	
@@ -414,8 +423,8 @@ public class Engine {
 		System.out.println();
 		/**/
 		
-		View.Instance.setRegisters();
-		View.Instance.setMemoryCells();
+//		View.Instance.setRegisters();
+//		View.Instance.setMemoryCells();
 		
 		//@mrwasp Not sure how exactly it should works
 		//TODO
@@ -425,6 +434,14 @@ public class Engine {
 		//		-View.RM (Register -> Memory cell)
 		//		-View.RR (Register -> Register)
 		//		-View.MR (Memory cell -> Register)
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		step();
+		if(currentOrder >= lastOrder){
+			timer.stop();
+		}
 	}
 	
 }

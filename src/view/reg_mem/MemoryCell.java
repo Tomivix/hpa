@@ -17,7 +17,7 @@ public class MemoryCell extends EditableCell {
 	
 	@Override
 	protected int getValue() {
-		return Engine.current.getVar(index);
+		return Engine.current.getVarFromAdress((index * 4) + 1024);
 	}
 
 	@Override
