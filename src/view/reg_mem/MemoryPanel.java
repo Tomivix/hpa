@@ -1,5 +1,6 @@
 package view.reg_mem;
 
+import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.BorderFactory;
@@ -20,6 +21,7 @@ public class MemoryPanel extends JPanel{
 	private MemoryCell[] memoryCells;
 	public MemoryPanel(){
 		super();
+		memoryCells = new MemoryCell[0];
 		super.setLayout(layout = new SpringLayout());
 		super.setBorder(BorderFactory.createDashedBorder(null, 5, 5));
 		panelLabel = new JLabel("Memory Cells");
@@ -38,19 +40,15 @@ public class MemoryPanel extends JPanel{
 		}
 		this.memoryCells = new MemoryCell[Engine.current.getVarCount()];
 		for(int i = 0; i < Engine.current.getVarCount(); i++){
-			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, "Test label", i);
+			memoryCells[i]= new MemoryCell(View.MEM_CELL_WIDTH*(i%View.MEM_CELL_COL_COUNT), (int) (Math.floor(i/View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT, i);
 		}
 		
 		for(int i = 0; i < memoryCells.length; i++){
 			MemoryCell memCell = memoryCells[i];
 			super.add(memCell);
-			layout.putConstraint(WEST, memCell, memCell.getTopX(), WEST, this);
-			layout.putConstraint(EAST, memCell, View.MEM_CELL_WIDTH, WEST, memCell);
-			layout.putConstraint(NORTH, memCell, memCell.getTopY(), NORTH, this);
-			layout.putConstraint(SOUTH, memCell, View.MEM_CELL_HEIGHT, NORTH, memCell);
 		}
-		super.validate();
-		super.repaint();
+		recalculateCellsPosition();
+		super.revalidate();
 	}
 	
 	public Point getRelativeCellLoc(int memCellIndex){
@@ -67,6 +65,8 @@ public class MemoryPanel extends JPanel{
 			layout.putConstraint(NORTH, memCell, memCell.getTopY(), NORTH, this);
 			layout.putConstraint(SOUTH, memCell, View.MEM_CELL_HEIGHT, NORTH, memCell);
 		}
+		Dimension panelDim = new Dimension(View.MEM_CELL_COL_COUNT*View.MEM_CELL_WIDTH, (int) (Math.ceil((float)memoryCells.length/(float)View.MEM_CELL_COL_COUNT)*(View.MEM_CELL_HEIGHT+View.MEM_CELL_VERT_PADDING))+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT);
+		super.setPreferredSize(panelDim);
 		super.doLayout();
 	}
 	

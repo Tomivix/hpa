@@ -5,14 +5,11 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import view.View;
-import view.reg_mem.RMPanel;
 
 public class Engine implements ActionListener {
 	//const values
@@ -144,6 +141,15 @@ public class Engine implements ActionListener {
 		return vars.size();
 	}
 	
+	public String getVarLabel(int address){
+		for(Map.Entry<String, Integer> entry : varLabels.entrySet()){
+			if(entry.getValue().intValue() == address){
+				return entry.getKey();
+			}
+		}
+		return address+":";
+	}
+	
 	public void addOrder(String label, String order, int size){
 		if(label != null) orderLabels.put(label, lastOrder);
 		orders.put(lastOrder, order);
@@ -188,7 +194,7 @@ public class Engine implements ActionListener {
 						case "D": reg = getReg(arg1) / getReg(arg2); break;
 						case "C": reg = getReg(arg1) - getReg(arg2); break;
 					} if(!op.equals("C")) setReg(arg1, reg); setFlag(reg);
-					View.Instance.updateValues(arg2, arg1, View.RR);
+					View.Instance.updateValues(arg2, arg1, View.RR, View.ARITM);
 				}
 			});
 		}
@@ -196,7 +202,7 @@ public class Engine implements ActionListener {
 		functions.put("LR", new Function(){
 			public void execute(int arg1, int arg2){
 				setReg(arg1, getReg(arg2));
-				View.Instance.updateValues(arg2, arg1, View.RR);
+				View.Instance.updateValues(arg2, arg1, View.RR, View.LOAD);
 			}
 		});		
 		
@@ -212,7 +218,7 @@ public class Engine implements ActionListener {
 						case "D": reg = getReg(arg1) / getVarFromAdress(arg2); break;
 						case "C": reg = getReg(arg1) - getVarFromAdress(arg2); break;
 					} if(!op.equals("C")) setReg(arg1, reg); setFlag(reg);
-					View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
+					View.Instance.updateValues((arg2-1024)/4, arg1, View.MR, View.ARITM);
 				}
 			});
 		}
@@ -220,21 +226,21 @@ public class Engine implements ActionListener {
 		functions.put("L", new Function(){
 			public void execute(int arg1, int arg2){
 				setReg(arg1, getVarFromAdress(arg2));
-				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
+				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR, View.LOAD);
 			}
 		});
 		
 		functions.put("LA", new Function(){
 			public void execute(int arg1, int arg2){
 				setReg(arg1, arg2);
-				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR);
+				View.Instance.updateValues((arg2-1024)/4, arg1, View.MR, View.LOAD_ADDR);
 			}
 		});
 		
 		functions.put("ST", new Function(){
 			public void execute(int arg1, int arg2){
 				setVar(arg2, getReg(arg1));
-				View.Instance.updateValues(arg1, (arg2-1024)/4, View.RM);
+				View.Instance.updateValues(arg1, (arg2-1024)/4, View.RM, View.STORE);
 			}
 		});
 		
@@ -250,7 +256,7 @@ public class Engine implements ActionListener {
 					case "JZ": if(getFlag() == ZERO) setCurrentOrder(arg1); break;
 				
 				}
-				
+				View.Instance.updateValues(-1, -1, (byte) -1, (byte) -1);
 			}
 		});
 		}

@@ -13,23 +13,23 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
 public class View {
 	public static final byte RR = 0, MR = 1, RM = 2;
+	public static final byte ARITM = 0, STORE = 1, LOAD = 2, LOAD_ADDR = 3;
 	
 	public static View Instance;
 	
-	public final static int DEF_RES_H = 1080, DEF_RES_W = 1920;
-	public static int FRAME_WIDTH = 1070, FRAME_HEIGHT = 750;
+	public static int FRAME_WIDTH = 870, FRAME_HEIGHT = 560;
 	public static int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
 	public static int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public static int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
 	public static int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public static int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
+	public static final int DEF_CODE_AREA_WIDTH = 300;
 	
 	public static int MEM_CELL_COL_COUNT = 5;
 	
@@ -38,12 +38,6 @@ public class View {
 	private RMPanel rmPanel;
 	public View(){
 		Instance = this;
-		
-		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
-		if(screenDim.height < DEF_RES_H ||
-				screenDim.width < DEF_RES_W){
-			setupConstants(Math.min(screenDim.height/(float)DEF_RES_H, screenDim.width/(float)DEF_RES_W));
-		}
 		
 		frame = new JFrame("Pseudo Assembler Visualizer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,16 +81,18 @@ public class View {
 		c.weighty = 1;
 		frame.add(buttonPanel, c);
 		
-		Dimension minDim = new Dimension(REGISTER_WIDTH + REG_MEM_PAD + MEM_CELL_WIDTH + 5, 0);
+		Dimension minCodeDim = new Dimension(DEF_CODE_AREA_WIDTH, 0);
 		
 		codePanel = new CodePanel();
-		codePanel.setMinimumSize(minDim);
+		codePanel.setMinimumSize(minCodeDim);
+		
+		Dimension minRMDim = new Dimension(REGISTER_WIDTH+MEM_CELL_WIDTH+50, 0);
 		
 		rmPanel = new RMPanel();
-		rmPanel.setMinimumSize(minDim);
+		rmPanel.setMinimumSize(minRMDim);
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, codePanel, rmPanel);
-		splitPane.setDividerLocation(FRAME_WIDTH/2);
+		splitPane.setDividerLocation(DEF_CODE_AREA_WIDTH);
 		c.weighty = 100;
 		c.gridy = 2;
 		frame.add(splitPane, c);
@@ -107,21 +103,6 @@ public class View {
 		frame.setLocationRelativeTo(null);
 	}
 	
-	private void setupConstants(float multiplier){
-		System.out.println("Multiplying by: " + multiplier);
-		FRAME_WIDTH *= multiplier;
-		FRAME_HEIGHT *= multiplier;
-		DEFAULT_DIR_PANE_HEIGHT *= multiplier;
-		LABEL_HEIGHT *= multiplier;
-		LABEL_DOWN_PAD *= multiplier;
-		REGISTER_WIDTH *= multiplier;
-		REGISTER_HEIGHT *= multiplier;
-		REGISTER_VERT_PADDING *= multiplier;
-		MEM_CELL_WIDTH *= multiplier;
-		MEM_CELL_HEIGHT *= multiplier;
-		MEM_CELL_VERT_PADDING *= multiplier;
-	}
-	
 	public void setRegisters(){
 		rmPanel.setRegisters();
 	}
@@ -130,12 +111,12 @@ public class View {
 		rmPanel.setMemoryCells();
 	}
 	
-	public void updateValues(final int reg, final int source, final byte mode){
+	public void updateValues(final int reg, final int source, final byte mode, final byte opType){
 		EventQueue.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
-				rmPanel.updateValues(reg, source, mode);
+				rmPanel.updateValues(reg, source, mode, opType);
 				
 			}
 		});

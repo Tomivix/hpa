@@ -1,5 +1,6 @@
 package view.reg_mem;
 
+import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.BorderFactory;
@@ -43,6 +44,8 @@ public class RegisterPanel extends JPanel {
 			layout.putConstraint(NORTH, regCell, regCell.getTopY(), NORTH, this);
 			layout.putConstraint(SOUTH, regCell, View.REGISTER_HEIGHT, NORTH, regCell);
 		}
+		Dimension panelDim = new Dimension(View.REGISTER_WIDTH, registerCells.length*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.LABEL_DOWN_PAD+View.LABEL_HEIGHT);
+		super.setPreferredSize(panelDim);
 	}
 	
 	public Point getRelativeRegisterLoc(int regIndex){

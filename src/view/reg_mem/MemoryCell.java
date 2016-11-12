@@ -8,9 +8,8 @@ public class MemoryCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
 
 	private String label;
-	public MemoryCell(int topX, int topY, String label, int index) {
+	public MemoryCell(int topX, int topY, int index) {
 		super(topX, topY);
-		this.label = label;
 		this.index = index;
 		setupLabels();
 	}
@@ -22,7 +21,7 @@ public class MemoryCell extends EditableCell {
 
 	@Override
 	protected String getLabel() {
-		return label;
+		return Engine.current.getVarLabel((index * 4) + 1024);
 	}
 	
 	public void setTopX(int newX){
