@@ -71,6 +71,7 @@ public class Engine implements ActionListener {
 	private byte flag;
 	
 	private Timer timer;
+	private int interval = 100;
 	
 	public Engine(){
 		current = this;
@@ -91,6 +92,7 @@ public class Engine implements ActionListener {
 		
 		createFunctions();
 		
+		timer = new Timer(interval, this);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -353,7 +355,6 @@ public class Engine implements ActionListener {
 	
 	//@mrwasp
 	public void run(){
-		timer = new Timer(1000, this);
 		timer.start();
 	}
 	
@@ -408,6 +409,15 @@ public class Engine implements ActionListener {
 		if(currentOrder >= lastOrder){
 			timer.stop();
 		}
+	}
+	
+	public void setRunInterval(int interval){
+		this.interval = interval;
+		timer.setDelay(interval);
+	}
+	
+	public void pause(){
+		timer.stop();
 	}
 	
 }

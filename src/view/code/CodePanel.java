@@ -16,6 +16,7 @@ public class CodePanel extends JPanel{
 	private static final long serialVersionUID = 1L;
 
 	JTextPane dirPane, ordersPane;
+	OrderStyledDocument orderSDoc;
 	public CodePanel(){
 		super();
 		super.setLayout(new GridLayout(1, 0));
@@ -27,7 +28,7 @@ public class CodePanel extends JPanel{
 		
 		ordersPane = new JTextPane();
 		NumHeader orderNumHeader = new NumHeader(ordersPane);
-		OrderStyledDocument orderSDoc = new OrderStyledDocument(orderNumHeader);
+		orderSDoc = new OrderStyledDocument(orderNumHeader);
 		ordersPane.setStyledDocument(orderSDoc);
 		CodeArea orderArea = new CodeArea("Orders:", ordersPane, orderNumHeader);
 		
@@ -57,5 +58,9 @@ public class CodePanel extends JPanel{
 			e.printStackTrace();
 		}
 		return out;
+	}
+	
+	public void highlightLine(int index){
+		orderSDoc.highlightLine(index);
 	}
 }

@@ -6,6 +6,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 
+import view.View;
 import view.code.NumHeader;
 
 public abstract class ColorStyledDocument extends DefaultStyledDocument {
@@ -21,6 +22,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 	public void insertString(int offset, String str, AttributeSet a){
 		try {
 			super.insertString(offset, str.toUpperCase(), a);
+			invalidateBuild();
 			recalculateStyles();
 			numHeader.updateHeader(dFont);
 		} catch (BadLocationException e) {
@@ -32,6 +34,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 	public void remove(int offset, int length){
 		try {
 			super.remove(offset, length);
+			invalidateBuild();
 			recalculateStyles();
 			numHeader.updateHeader(dFont);
 		} catch (BadLocationException e) {
@@ -40,4 +43,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 	}
 	
 	public abstract void recalculateStyles();
+	protected void invalidateBuild(){
+		View.Instance.setIsBuilt(false);
+	}
 }

@@ -14,6 +14,7 @@ public class OrderStyledDocument extends ColorStyledDocument {
 	private static final long serialVersionUID = 1L;
 	
 	private AttributeSet defStyle, labelStyle, orderStyle, paramStyle, invStyle;
+	private AttributeSet defBG, highBG;
 	public OrderStyledDocument(NumHeader numHeader) {
 		super(numHeader);
 		StyleContext cont = StyleContext.getDefaultStyleContext();
@@ -22,6 +23,8 @@ public class OrderStyledDocument extends ColorStyledDocument {
 		orderStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.CYAN);
 		paramStyle = cont.addAttribute(defStyle, StyleConstants.Bold, true);
 		invStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, Color.red);
+		defBG = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, Color.white);
+		highBG = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, Color.cyan);
 		dFont = cont.getFont(defStyle);
 		numHeader.updateHeader(dFont);
 	}
@@ -44,7 +47,29 @@ public class OrderStyledDocument extends ColorStyledDocument {
 			for(int i = 0; i < indexes[3].length; i++){
 				super.setCharacterAttributes(indexes[3][i], indexes[3][++i], invStyle, true);
 			}
+			
 		}catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void highlightLine(int index){
+		try {
+			int startI = 0, endI = 0;
+			char[] chars = super.getText(0, super.getLength()).toCharArray();
+			for(int i = 0, j = 0; j < chars.length && i < index; j++){
+				if(chars[j] == '\n'){
+					i++;
+					if(i == index){
+						endI = j;
+					}else{
+						startI = j+1;
+					}
+				}
+			}
+			super.setCharacterAttributes(0, super.getLength(), defBG, false);
+			super.setCharacterAttributes(startI, endI-startI, highBG, false);
+		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 	}
