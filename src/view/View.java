@@ -1,15 +1,10 @@
 package view;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.JSplitPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import core.Engine;
+import view.buttons.ButtonPanel;
 import view.code.CodePanel;
 import view.reg_mem.RMPanel;
 
@@ -17,20 +12,21 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Toolkit;
 
 
-public class View implements ChangeListener {
+public class View{
 	public static final byte RR = 0, MR = 1, RM = 2;
 	public static final byte ARITM = 0, STORE = 1, LOAD = 2, LOAD_ADDR = 3;
 	
 	public static View Instance;
 	
-	public static final int FRAME_WIDTH = 870, FRAME_HEIGHT = 760;
+	public static int FRAME_WIDTH = 890, FRAME_HEIGHT = 780;
+	public static final float MAX_SCREEN_PERC_SIZE = 0.9f;
+	public static double IMAGE_BUTTON_SCALE = 0.4;
 	public static final int SLIDER_MIN_VAL = 100, SLIDER_MAX_VAL = 20 * SLIDER_MIN_VAL;
 	public static final int PANELS_PAD = 6, DEFAULT_DIR_PANE_HEIGHT = 220, LABEL_HEIGHT = 15, LABEL_DOWN_PAD = 10;;
-	public static final int REGISTER_WIDTH = 90, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
+	public static final int REGISTER_WIDTH = 110, REGISTER_HEIGHT = 30, REGISTER_VERT_PADDING = 10, FONT_VERT_OFF = -3;
 	public static final int REG_MEM_PAD = 10, PANEL_DRAW_UP_PAD = 10;
 	public static final int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public static final int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
@@ -41,9 +37,7 @@ public class View implements ChangeListener {
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
-	private JSlider timeSlider;
-	private JLabel runInfoLabel;
-	private JButton runButton, stepButton;
+	private ButtonPanel buttonPanel;
 	private boolean running = false;
 	public View(){
 		Instance = this;
@@ -53,56 +47,15 @@ public class View implements ChangeListener {
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		JPanel buttonPanel = new JPanel();
-		JButton buildButton = new JButton("Build");
-		buildButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Engine.current.buildDirectivesFromString(codePanel.getDirectives());
-				Engine.current.buildOrdersFromString(codePanel.getOrders());
-				setIsBuilt(true);
-			}
-		});
+		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
+		if(screenDim.getHeight() * MAX_SCREEN_PERC_SIZE < FRAME_HEIGHT){
+			FRAME_HEIGHT = (int) (screenDim.getHeight() * MAX_SCREEN_PERC_SIZE);
+		}
+		if(screenDim.getWidth() * MAX_SCREEN_PERC_SIZE < FRAME_WIDTH){
+			FRAME_WIDTH = (int) (screenDim.getWidth() * MAX_SCREEN_PERC_SIZE);
+		}
 		
-		runButton = new JButton("Run");
-		runButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				running = !running;
-				if(running){
-					runButton.setText("Pause");
-					Engine.current.run();
-				}else{
-					runButton.setText("Run");
-					Engine.current.pause();
-				}
-			}
-		});
-		
-		timeSlider = new JSlider(JSlider.HORIZONTAL, 0, SLIDER_MAX_VAL, SLIDER_MIN_VAL);
-		timeSlider.setMinorTickSpacing(SLIDER_MIN_VAL);
-		timeSlider.setMajorTickSpacing(10 * SLIDER_MIN_VAL);
-		timeSlider.setPaintTicks(true);
-		timeSlider.setSnapToTicks(true);
-		timeSlider.setPaintLabels(true);
-		timeSlider.addChangeListener(this);
-		
-		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
-		
-		stepButton = new JButton("Step");
-		stepButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Engine.current.step();
-			}
-		});
-		
-		buttonPanel.add(buildButton);
-		buttonPanel.add(timeSlider);
-		buttonPanel.add(runInfoLabel);
-		buttonPanel.add(runButton);
-		buttonPanel.add(stepButton);
-		
+		buttonPanel = new ButtonPanel();
 		setIsBuilt(false);
 		
 		c.fill = 1;
@@ -164,12 +117,6 @@ public class View implements ChangeListener {
 	public void resetLastEdited() {
 		rmPanel.resetLastEdited();
 	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		Engine.current.setRunInterval(timeSlider.getValue());
-		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)SLIDER_MIN_VAL)*SLIDER_MIN_VAL + "ms");
-	}
 	
 	public void highlightLine(int index){
 		codePanel.highlightLine(index);
@@ -177,11 +124,23 @@ public class View implements ChangeListener {
 	
 	public void setIsBuilt(boolean built){
 		if(!running && !built){
-			runButton.setEnabled(false);
-			stepButton.setEnabled(false);
+			buttonPanel.setRunStepButtonsEnabled(false);
 		}else{
-			runButton.setEnabled(true);
-			stepButton.setEnabled(true);
+			buttonPanel.setRunStepButtonsEnabled(true);
 		}
+	}
+	
+	public void build(){
+		Engine.current.buildDirectivesFromString(codePanel.getDirectives());
+		Engine.current.buildOrdersFromString(codePanel.getOrders());
+		setIsBuilt(true);
+	}
+	
+	public boolean isRunning(){
+		return running;
+	}
+	
+	public void setRunning(boolean running){
+		this.running = running;
 	}
 }
