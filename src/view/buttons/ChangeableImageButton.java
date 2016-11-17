@@ -30,7 +30,11 @@ public class ChangeableImageButton extends ImageButton {
 	}
 
 	public void swapButton() {
-		if(currImg == 1){
+		setImage(currImg == 2 ? 1 : 2);
+	}
+	
+	public void setImage(int index){
+		if(index == 2){
 			currImg = 2;
 			disImg = disImg2;
 			enImg = enImg2;

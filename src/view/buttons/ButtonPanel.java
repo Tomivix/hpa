@@ -32,7 +32,6 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				View.Instance.setRunning(!View.Instance.isRunning());
-				runButton.swapButton();
 				if(View.Instance.isRunning()){
 					Engine.current.run();
 				}else{
@@ -74,5 +73,9 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 	public void setRunStepButtonsEnabled(boolean e){
 		runButton.setEnabled(e);
 		stepButton.setEnabled(e);
+	}
+	
+	public void setRunButtonImg(int index){
+		runButton.setImage(index);
 	}
 }

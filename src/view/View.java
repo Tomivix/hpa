@@ -134,6 +134,8 @@ public class View{
 		Engine.current.buildDirectivesFromString(codePanel.getDirectives());
 		Engine.current.buildOrdersFromString(codePanel.getOrders());
 		setIsBuilt(true);
+		Engine.current.pause();
+		setRunning(false);
 	}
 	
 	public boolean isRunning(){
@@ -142,5 +144,6 @@ public class View{
 	
 	public void setRunning(boolean running){
 		this.running = running;
+		buttonPanel.setRunButtonImg(running ? 2 : 1);
 	}
 }
