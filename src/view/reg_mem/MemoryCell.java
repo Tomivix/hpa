@@ -21,7 +21,8 @@ public class MemoryCell extends EditableCell {
 
 	@Override
 	protected String getLabel() {
-		return Engine.current.getVarLabel((index * 4) + 1024);
+		String label = Engine.current.getVarLabel((index * 4) + 1024);
+		return (index * 4) + 1024 + (label.equals("") ? "" : " (" + label + ")");
 	}
 	
 	public void setTopX(int newX){

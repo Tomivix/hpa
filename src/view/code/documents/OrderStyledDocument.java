@@ -14,17 +14,24 @@ public class OrderStyledDocument extends ColorStyledDocument {
 	private static final long serialVersionUID = 1L;
 	
 	private AttributeSet defStyle, labelStyle, orderStyle, paramStyle, invStyle;
-	private AttributeSet defBG, highBG;
+	private AttributeSet defBg, highBg;
+	private Color defC = Color.BLACK,
+			labelC = new Color(131, 110, 28),
+			orderC = new Color(0, 18, 68),
+			paramC = new Color(107, 79, 240),
+			invC = new Color(216, 29, 29);
+	private Color defBgC = Color.WHITE,
+			highBgC = new Color(199, 199, 199);
 	public OrderStyledDocument(NumHeader numHeader) {
 		super(numHeader);
 		StyleContext cont = StyleContext.getDefaultStyleContext();
-		defStyle = cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18);
-		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Italic, true), StyleConstants.Foreground, Color.ORANGE);
-		orderStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.CYAN);
-		paramStyle = cont.addAttribute(defStyle, StyleConstants.Bold, true);
-		invStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, Color.red);
-		defBG = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, Color.white);
-		highBG = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, Color.cyan);
+		defStyle = cont.addAttribute(cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18), StyleConstants.Foreground, defC);
+		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Italic, true), StyleConstants.Foreground, labelC);
+		orderStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, orderC);
+		paramStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, paramC);
+		invStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Foreground, invC), StyleConstants.Underline, true);
+		defBg = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, defBgC);
+		highBg = cont.addAttribute(cont.getEmptySet(), StyleConstants.Background, highBgC);
 		dFont = cont.getFont(defStyle);
 		numHeader.updateHeader(dFont);
 	}
@@ -67,8 +74,8 @@ public class OrderStyledDocument extends ColorStyledDocument {
 					}
 				}
 			}
-			super.setCharacterAttributes(0, super.getLength(), defBG, false);
-			super.setCharacterAttributes(startI, endI-startI, highBG, false);
+			super.setCharacterAttributes(0, super.getLength(), defBg, false);
+			super.setCharacterAttributes(startI, endI-startI, highBg, false);
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}

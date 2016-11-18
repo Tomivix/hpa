@@ -84,7 +84,7 @@ public class Engine implements ActionListener {
 		mathOps = new String[]{"A","S","M","D","C"};
 
 		regs = new int[16];
-		for(int reg : regs) reg = (new Random()).nextInt();
+		for(@SuppressWarnings("unused") int reg : regs) reg = (new Random()).nextInt();
 		regs[14] = lastVar = 1024;
 		regs[15] = lastOrder = currentOrder = 2048;
 
@@ -149,7 +149,7 @@ public class Engine implements ActionListener {
 				return entry.getKey();
 			}
 		}
-		return address+":";
+		return "";
 	}
 	
 	public void addOrder(String label, String order, int size){
@@ -396,6 +396,7 @@ public class Engine implements ActionListener {
 		
 		functions.get(command).execute(arg1, arg2);
 		if(actualOrder == currentOrder) currentOrder += (type==JUMP) ? 2 : 4;
+		View.Instance.highlightLine(4);
 
 		/*prints for debugging*/
 		for(int reg : regs) System.out.print(reg + " ");

@@ -14,14 +14,19 @@ public class DirStyledDocument extends ColorStyledDocument {
 	private static final long serialVersionUID = 1L;
 	
 	private AttributeSet defStyle, labelStyle, dirStyle, paramStyle, invStyle;
+	private Color defC = Color.BLACK,
+			labelC = new Color(131, 110, 28),
+			dirC = new Color(0, 18, 68),
+			paramC = new Color(107, 79, 240),
+			invC = new Color(216, 29, 29);
 	public DirStyledDocument(NumHeader numHeader) {
 		super(numHeader);
 		StyleContext cont = StyleContext.getDefaultStyleContext();
-		defStyle = cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18);
-		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.green);
-		dirStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Bold, true), StyleConstants.Foreground, Color.BLUE);
-		paramStyle = cont.addAttribute(defStyle, StyleConstants.Bold, true);
-		invStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, Color.red);
+		defStyle = cont.addAttribute(cont.addAttribute(cont.addAttribute(cont.getEmptySet(), StyleConstants.FontFamily, "Monospaced"), StyleConstants.FontSize, 18), StyleConstants.Foreground, defC);
+		labelStyle = cont.addAttribute(cont.addAttribute(defStyle, StyleConstants.Foreground, labelC), StyleConstants.Italic, true);
+		dirStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, dirC);
+		paramStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, paramC);
+		invStyle = cont.addAttribute(defStyle, StyleConstants.Foreground, invC);
 		dFont = cont.getFont(defStyle);
 		numHeader.updateHeader(dFont);
 	}
