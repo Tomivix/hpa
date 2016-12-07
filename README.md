@@ -1,2 +1,2 @@
 # hpa
-HPA (Homenda's Pseudo-Asembler) IDE Project
+HPA (Homenda's Pseudo-Assembler) IDE Project
