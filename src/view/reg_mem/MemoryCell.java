@@ -16,13 +16,13 @@ public class MemoryCell extends EditableCell {
 	
 	@Override
 	protected int getValue() {
-		return Engine.current.getVarFromAdress((index * 4) + 1024);
+		return Engine.current.getVar(index);
 	}
 
 	@Override
 	protected String getLabel() {
-		String label = Engine.current.getVarLabel((index * 4) + 1024);
-		return (index * 4) + 1024 + (label.equals("") ? "" : " (" + label + ")");
+		String label = Engine.current.getVarLabel(index);
+		return Engine.current.getVarAddress(index) + (label.equals("") ? "" : " (" + label + ")");
 	}
 	
 	public void setTopX(int newX){
