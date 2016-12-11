@@ -16,7 +16,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 	private static final long serialVersionUID = 1L;
 
 	private ChangeableImageButton runButton;
-	ImageButton stepButton;
+	ImageButton stepButton, backstepButton;
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
@@ -33,18 +33,18 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 				//TODO load
 			}
 		});
-		
-		
-		
-		
+
+
+
+
 		ImageButton buildButton = new ImageButton("build", new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				View.Instance.build();
 			}
 		});
-		
+
 		runButton = new ChangeableImageButton("run", "pause", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -56,7 +56,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 				}
 			}
 		});
-		
+
 		timeSlider = new JSlider(JSlider.HORIZONTAL, 0, View.SLIDER_MAX_VAL, View.SLIDER_MIN_VAL);
 		timeSlider.setMinorTickSpacing(View.SLIDER_MIN_VAL);
 		timeSlider.setMajorTickSpacing(10 * View.SLIDER_MIN_VAL);
@@ -64,24 +64,24 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		timeSlider.setSnapToTicks(true);
 		timeSlider.setPaintLabels(true);
 		timeSlider.addChangeListener(this);
-		
+
 		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
-		
+
 		stepButton = new ImageButton("step", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.step();
 			}
 		});
-		
+
 		//@mrwasp
-		ImageButton backStepButton = new ImageButton("backstep", new ActionListener() {
+		backstepButton = new ImageButton("backstep", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.backStep();
 			}
 		});
-		
+
 		super.add(saveButton);
 		super.add(loadButton);
 		super.add(buildButton);
@@ -89,20 +89,21 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		super.add(runInfoLabel);
 		super.add(runButton);
 		super.add(stepButton);
-		super.add(backStepButton);
+		super.add(backstepButton);
 	}
-	
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		Engine.current.setRunInterval(timeSlider.getValue());
 		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL + "ms");
 	}
-	
+
 	public void setRunStepButtonsEnabled(boolean e){
 		runButton.setEnabled(e);
 		stepButton.setEnabled(e);
+		backstepButton.setEnabled(e);
 	}
-	
+
 	public void setRunButtonImg(int index){
 		runButton.setImage(index);
 	}

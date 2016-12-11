@@ -35,14 +35,14 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 			loadColor = Color.red,
 			loadAddressColor = Color.DARK_GRAY;
 	private Color currColor;
-	
+
 	public static int lastReg1 = -1, lastReg2 = -1, lastCell = -1;
 	public static byte lastOrderMode = -1, lastOperationType = -1;
 	public RMPanel(){
 		super();
 		super.setLayout(layout = new SpringLayout());
 		super.addComponentListener(this);
-		
+
 		registerPanel = new RegisterPanel();
 		regScrollPane = new JScrollPane(registerPanel);
 		regScrollPane.getVerticalScrollBar().addAdjustmentListener(this);
@@ -53,7 +53,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		layout.putConstraint(NORTH, regScrollPane, 0, NORTH, this);
 		layout.putConstraint(SOUTH, regScrollPane, 0, SOUTH, this);
 		super.add(regScrollPane);
-		
+
 		memoryPanel = new MemoryPanel();
 		memScrollPane = new JScrollPane(memoryPanel);
 		memScrollPane.getVerticalScrollBar().addAdjustmentListener(this);
@@ -73,15 +73,15 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		layout.putConstraint(SOUTH, registerPanel, Engine.current.getRegCount()*(View.REGISTER_HEIGHT+View.REGISTER_VERT_PADDING)+View.PANEL_DRAW_UP_PAD+View.LABEL_HEIGHT, NORTH, registerPanel);
 		layout.putConstraint(SOUTH, memoryPanel, 0, SOUTH, registerPanel);
 	}
-	
+
 	public void setMemoryCells(){
 		memoryPanel.setMemoryCells();
 	}
-	
+
 	@Override
 	public void paint(Graphics g){
 		super.paint(g);
-		
+
 		g.setColor(currColor);
 		int memCellOffset;
 		switch(lastOrderMode){
@@ -122,7 +122,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		case -1:
 			break;
 		}
-		
+
 		if (p1 != null && p6 != null && lastOrderMode != -1) {
 			Point p3;
 			Point p4;
@@ -131,7 +131,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 			if (lastReg1 != lastReg2 - 1) {
 				p3 = new Point(layout.getConstraints(regScrollPane).getWidth().getValue() + View.REG_MEM_PAD / 2, p2.y);
 				p4 = new Point(p3.x, p5.y);
-				
+
 				g2.draw(new Line2D.Float(p1, p2));
 				g2.draw(new Line2D.Float(p2, p3));
 				g2.draw(new Line2D.Float(p3, p4));
@@ -139,12 +139,12 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 			}else{
 				g2.draw(new Line2D.Float(p1, p6));
 			}
-			
-			
+
+
 			drawArrow(p6, g);
 		}
 	}
-	
+
 	public void drawArrow(Point p, Graphics g){
 		int[] xP = new int[3];
 		int[] yP = new int[3];
@@ -156,7 +156,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		yP[2] = p.y-View.ARROW_LENGTH;
 		g.fillPolygon(xP, yP, 3);
 	}
-	
+
 	public void updateValues(int source, int dest, byte mode, byte opType){
 		lastOrderMode = mode;
 		int lr1 = lastReg1, lr2 = lastReg2, lc = lastCell;
@@ -194,21 +194,21 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 			lastCell = -1;
 			lastOrderMode = -1;
 		}
-		
+
 		if (lr1 != -1)
 			registerPanel.updateRegister(lr1);
 		if (lr2 != -1)
 			registerPanel.updateRegister(lr2);
 		if (lc != -1)
 			memoryPanel.updateCell(lc);
-		
+
 		switch(opType){
 		case View.ARITM:
 			currColor = aritmColor;
 			break;
 		case View.LOAD:
 			currColor = loadColor;
-			break;	
+			break;
 		case View.LOAD_ADDR:
 			currColor = loadAddressColor;
 			break;
@@ -218,11 +218,11 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		}
 		repaint();
 	}
-	
+
 	public void updateRegister(int index){
 		registerPanel.updateRegister(index);
 	}
-	
+
 	public void updateMemCell(int index){
 		memoryPanel.updateCell(index);
 	}
@@ -248,7 +248,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 	public void componentShown(ComponentEvent e) {
 		recalculateCells();
 	}
-	
+
 	private void recalculateCells(){
 		if(layout.getConstraints(memoryPanel).getWidth().getValue() <= 0){
 			return;
@@ -257,7 +257,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 		memoryPanel.recalculateCellsPosition();
 		repaint();
 	}
-	
+
 	public void resetLastEdited(){
 		int lr1 = lastReg1;
 		int lr2 = lastReg2;
@@ -275,7 +275,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		
+
 	}
 
 
@@ -293,13 +293,13 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		
+
 	}
 
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		
+
 	}
 
 

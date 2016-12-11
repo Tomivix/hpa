@@ -18,24 +18,24 @@ public class Engine implements ActionListener {
 	public static final int ZERO = 0, POSITIVE = 1, NEGATIVE = -1, ERROR = 3;
 	public static final int RR = 1, RM = 2, JUMP = 3;
 	public static final int FIRST_VAR = 1024, FIRST_ORDER = 2048;
-	
+
 	public static Engine current;
-	
+
 	private ArrayList<String> orders;
 	private HashMap<String, Integer> orderLabels;
 	private HashMap<Integer, Integer> orderIndexes; // address -> index
 	private ArrayList<Integer> vars;
 	private HashMap<String, Integer> varLabels;
 	private int[] regs;
-	//history stores info in 9-int array: {orderIndex, flag, changed reg (or -1), changed cell (or -1), changed value, 4x View ops}, max 1000 steps 
+	//history stores info in 9-int array: {orderIndex, flag, changed reg (or -1), changed cell (or -1), changed value, 4x View ops}, max 1000 steps
 	private LinkedList<Integer[]> history;
-	
+
 	private int currentOrder; //index of order, not address
 	private int flag;
-	
+
 	private Timer timer;
 	private int interval = 100;
-	
+
 	public Engine(){
 		current = this;
 		orders = new ArrayList<>();
@@ -45,14 +45,14 @@ public class Engine implements ActionListener {
 		varLabels = new HashMap<>();
 		history = new LinkedList<>();
 		regs = new int[16];
-		
+
 		for(@SuppressWarnings("unused") int reg : regs) reg = new Random().nextInt();
 		regs[14] = FIRST_VAR;
 		regs[15] = FIRST_ORDER;
 		currentOrder = 0;
-		
+
 		flag = ERROR;
-		
+
 		timer = new Timer(interval, this);
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -62,29 +62,29 @@ public class Engine implements ActionListener {
 			}
 		});
 	}
-	
+
 	public int getReg(int id){
 		return regs[id];
 	}
-	
+
 	public void setReg(int id, int value){
 		regs[id] = value;
 		View.Instance.updateRegister(id);
 	}
-	
+
 	public int getRegCount(){
 		return regs.length;
 	}
-	
+
 	public void addVar(String label, int value){
 		varLabels.put(label, vars.size()*4 + regs[14]);
 		vars.add(value);
 	}
-	
+
 	public int getVar(int id){
 		return vars.get(id);
 	}
-	
+
 	public int getVar(String label){
 		int id = varLabels.get(label);
 		return getVarFromAddress(id);
@@ -93,41 +93,41 @@ public class Engine implements ActionListener {
 	public int getVarFromAddress(int address){
 		return vars.get((address-regs[14])/4);
 	}
-		
+
 	public int getVarAddress(int id){
 		return id*4 + regs[14];
 	}
-	
+
 	public void setVar(int id, int value){
 		vars.set(id, value);
 		View.Instance.updateMemCell(id);
 	}
-	
+
 	public int getVarCount(){
 		return vars.size();
 	}
-	
+
 	public String getVarLabel(int id){
 		int address = getVarAddress(id);
 		for(Map.Entry<String, Integer> entry : varLabels.entrySet()){
 			if(entry.getValue().intValue() == address) return entry.getKey();
 		} return "";
 	}
-	
+
 	public void addOrder(String label, String order, int address){
 		if(label != null) orderLabels.put(label, address);
 		orderIndexes.put(address, orders.size());
 		orders.add(order);
 	}
-	
+
 	public int getFlag(){
 		return flag;
 	}
-	
+
 	public void setFlag(int value){
 		flag = (value > 0) ? POSITIVE : (value < 0) ? NEGATIVE : ZERO;
 	}
-	
+
 	//replaced functions
 	public void execute(int arg1, int arg2, int type, String cmd){
 		if(type==JUMP){
@@ -137,7 +137,7 @@ public class Engine implements ActionListener {
 					(cmd.equals("JN") && flag==NEGATIVE ) ||
 					(cmd.equals("JZ") && flag==ZERO )) currentOrder = orderIndexes.get(arg1);
 			else currentOrder++;
-			
+
 			View.Instance.updateValues(-1, -1, (byte) -1, (byte) -1);
 		}
 		else{
@@ -151,7 +151,7 @@ public class Engine implements ActionListener {
 			byte vOpType = View.ARITM;
 			switch(cmd){
 				case "A": case "AR": result+=value; break;
-				case "S": case "SR": 
+				case "S": case "SR":
 				case "C": case "CR": result-=value; break;
 				case "M": case "MR": result*=value; break;
 				case "D": case "DR": result/=value; break;
@@ -170,18 +170,18 @@ public class Engine implements ActionListener {
 				vOpType = View.STORE;
 			}
 			history.addLast(new Integer[]{
-					currentOrder, flag, 
+					currentOrder, flag,
 					cmd.equals("ST") ? -1 : arg1,
 					cmd.equals("ST") ? varId : -1,
 					oldValue,
 					vArg1, vArg2, (int)vCmdType, (int)vOpType});
 			if(history.size() > 1000) history.removeFirst();
-			
+
 			currentOrder++;
 			View.Instance.updateValues(vArg1, vArg2, vCmdType, vOpType);
 		}
 	}
-	
+
 	public void buildDirectivesFromString(String s){
 		View.Instance.resetLastEdited();
 		vars.clear(); varLabels.clear();
@@ -193,10 +193,10 @@ public class Engine implements ActionListener {
 				String label = line.substring(res[0][0], res[0][1] + 1);
 				String arg1 = (res[2][0] < 0) ? null : line.substring(res[2][0], res[2][1] + 1);
 				String arg2 = (res[3][0] < 0) ? null : line.substring(res[3][0], res[3][1] + 1);
-				
+
 				int count = (arg1 == null) ? 1 : Integer.parseInt(arg1);
 				int value = (arg2 == null) ? 0 : Integer.parseInt(arg2);
-				
+
 				if(arg2 == null){
 					addVar(label, new Random().nextInt(2000) - 1000);
 					for(int i = 1; i < count; i++) vars.add(new Random().nextInt(2000) - 1000);
@@ -207,7 +207,7 @@ public class Engine implements ActionListener {
 		}
 		View.Instance.setMemoryCells();
 	}
-	
+
 	public void buildOrdersFromString(String s){
 		int address = currentOrder = 0;
 		orders.clear(); orderLabels.clear(); orderIndexes.clear(); history.clear();
@@ -227,17 +227,20 @@ public class Engine implements ActionListener {
 	public void run(){
 		timer.start();
 	}
-	
+
 	public void step(){
-		if(currentOrder >= orders.size()) return;
-		
+		if(currentOrder >= orders.size()){
+			View.Instance.setRunning(false);
+			return;
+		}
+
 		String order = orders.get(currentOrder);
 		int res[][] = Parser.getPos(order, false);
 		int type = Parser.parse(order, false);
 		String command = order.substring(res[1][0], res[1][1] + 1);
 		String arg1s = (res[2][0] < 0) ? null : order.substring(res[2][0], res[2][1] + 1);
 		String arg2s = (res[3][0] < 0) ? null : order.substring(res[3][0], res[3][1] + 1);
-		
+
 		//arg1 = label if JUMP, regId if RR/RM
 		//arg2 = regId if RR, memId if RM, 0 if JUMP
 		//actualOrder - if jump change current order we don't jump to next command
@@ -254,15 +257,15 @@ public class Engine implements ActionListener {
 		}
 		View.Instance.highlightLine(currentOrder+1);
 		execute(arg1, arg2, type, command);
-		
+
 		//prints for debugging
 		System.out.println(currentOrder + " - " + order);
 		for(int reg : regs) System.out.print(reg + " ");
 		System.out.println("  flag = " + flag);
 	}
-	
-	
-	
+
+
+
 	public void backStep(){
 		if(history.isEmpty()) return;
 		Integer[] step = history.removeLast();
@@ -273,17 +276,20 @@ public class Engine implements ActionListener {
 		View.Instance.updateValues(step[5], step[6], (byte) (int)step[7], (byte) (int)step[8]);
 		View.Instance.highlightLine(currentOrder+1);
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		step(); if(currentOrder >= orders.size()) timer.stop();
+		step(); if(currentOrder >= orders.size()){
+			View.Instance.setRunning(false);
+			timer.stop();
+		}
 	}
 
 	public void setRunInterval(int interval){
 		this.interval = interval; timer.setDelay(interval);
 	}
-	
+
 	public void pause(){
 		timer.stop();
-	}	
+	}
 }

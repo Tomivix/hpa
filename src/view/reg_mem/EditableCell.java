@@ -13,11 +13,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import view.View;
+
 import static javax.swing.SpringLayout.*;
 
 public abstract class EditableCell extends JPanel implements MouseListener {
 	private static final long serialVersionUID = 1L;
-	
+
+	protected String tooltip = "Click to edit...";
+	protected Cursor handCursor, pointCursor;
 	protected int index;
 	protected boolean isRegister = false;
 	protected int topX, topY;
@@ -32,11 +36,13 @@ public abstract class EditableCell extends JPanel implements MouseListener {
 		super.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 		layout = new SpringLayout();
 		super.setLayout(layout);
-		super.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		super.setToolTipText("Click to edit...");
+		handCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+		pointCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		super.setCursor(handCursor);
+		super.setToolTipText(tooltip);
 		super.addMouseListener(this);
 	}
-	
+
 	protected void setupLabels(){
 		label = new JLabel(getLabel());
 		label.setForeground(labelDefColor);
@@ -46,14 +52,14 @@ public abstract class EditableCell extends JPanel implements MouseListener {
 		layout.putConstraint(NORTH, label, 0, NORTH, this);
 		layout.putConstraint(EAST, label, fm.stringWidth(label.getText()), WEST, label);
 		layout.putConstraint(SOUTH, label, fm.getHeight(), NORTH, label);
-		
+
 		value = new JLabel();
 		super.add(value);
 		layout.putConstraint(HORIZONTAL_CENTER, value, 0, HORIZONTAL_CENTER, this);
 		layout.putConstraint(VERTICAL_CENTER, value, 0, VERTICAL_CENTER, this);
 		updateValue();
 	}
-	
+
 	public void updateValue(){
 		value.setText(""+getValue());
 		if(isLastEdited()){
@@ -62,19 +68,19 @@ public abstract class EditableCell extends JPanel implements MouseListener {
 			value.setFont(value.getFont().deriveFont(Font.PLAIN, 12));
 		}
 	}
-	
+
 	protected abstract int getValue();
 	protected abstract String getLabel();
 	protected abstract boolean isLastEdited();
-	
+
 	public int getTopX(){
 		return topX;
 	}
-	
+
 	public int getTopY(){
 		return topY;
 	}
-	
+
 	@Override
 	public void paint(Graphics g){
 		label.setForeground(labelCurrColor);
@@ -84,26 +90,33 @@ public abstract class EditableCell extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseEntered(MouseEvent e){
-		bgCurrColor = bgHoverColor;
-		labelCurrColor = labelHoverColor;
-		repaint();
+		if (!View.Instance.isRunning()) {
+			super.setCursor(handCursor);
+			super.setToolTipText(tooltip);
+			bgCurrColor = bgHoverColor;
+			labelCurrColor = labelHoverColor;
+			repaint();
+		}else{
+			super.setCursor(pointCursor);
+			super.setToolTipText("");
+		}
 	}
-	
+
 	@Override
 	public void mouseExited(MouseEvent e){
 		bgCurrColor = bgDefColor;
 		labelCurrColor = labelDefColor;
 		repaint();
 	}
-	
-	
+
+
 	@Override
 	public void mouseReleased(MouseEvent e){
-		
+
 	}
-	
+
 	@Override
 	public void mousePressed(MouseEvent e){
-		
+
 	}
 }
