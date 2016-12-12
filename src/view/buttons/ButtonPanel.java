@@ -11,23 +11,24 @@ import javax.swing.event.ChangeListener;
 
 import core.Engine;
 import view.View;
+import view.View.Button;
 
 public class ButtonPanel extends JPanel implements ChangeListener{
 	private static final long serialVersionUID = 1L;
 
 	private ChangeableImageButton runButton;
-	ImageButton stepButton, backstepButton;
+	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton;
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
 		//@mrwasp
-		ImageButton saveButton = new ImageButton("save", new ActionListener() {
+		saveButton = new ImageButton("save", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//TODO save
 			}
 		});
-		ImageButton loadButton = new ImageButton("load", new ActionListener() {
+		loadButton = new ImageButton("load", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//TODO load
@@ -37,7 +38,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 
 
 
-		ImageButton buildButton = new ImageButton("build", new ActionListener() {
+		buildButton = new ImageButton("build", new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -98,13 +99,30 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL + "ms");
 	}
 
-	public void setRunStepButtonsEnabled(boolean e){
-		runButton.setEnabled(e);
-		stepButton.setEnabled(e);
-		backstepButton.setEnabled(e);
-	}
-
 	public void setRunButtonImg(int index){
 		runButton.setImage(index);
+	}
+
+	public void setButtonState(Button button, boolean state){
+		switch(button){
+		case LOAD:
+			loadButton.setEnabled(state);
+			break;
+		case SAVE:
+			saveButton.setEnabled(state);
+			break;
+		case BUILD:
+			buildButton.setEnabled(state);
+			break;
+		case STEP:
+			stepButton.setEnabled(state);
+			break;
+		case RUN:
+			runButton.setEnabled(state);
+			break;
+		case BACKSTEP:
+			backstepButton.setEnabled(state);
+			break;
+		}
 	}
 }

@@ -16,11 +16,15 @@ import java.awt.Toolkit;
 
 
 public class View{
+	public static enum Button{
+		SAVE, LOAD, BUILD, STEP, BACKSTEP, RUN
+	}
+
 	public static final byte RR = 0, MR = 1, RM = 2;
 	public static final byte ARITM = 0, STORE = 1, LOAD = 2, LOAD_ADDR = 3;
-	
+
 	public static View Instance;
-	
+
 	public static int FRAME_WIDTH = 890, FRAME_HEIGHT = 780;
 	public static final float MAX_SCREEN_PERC_SIZE = 0.9f;
 	public static double IMAGE_BUTTON_SCALE = 0.4;
@@ -31,9 +35,9 @@ public class View{
 	public static final int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public static final int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	public static final int DEF_CODE_AREA_WIDTH = 300;
-	
+
 	public static int MEM_CELL_COL_COUNT = 5;
-	
+
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
@@ -41,12 +45,12 @@ public class View{
 	private boolean running = false;
 	public View(){
 		Instance = this;
-		
-		frame = new JFrame("Pseudo Assembler Visualizer");
+
+		frame = new JFrame("HPA");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		
+
 		Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
 		if(screenDim.getHeight() * MAX_SCREEN_PERC_SIZE < FRAME_HEIGHT){
 			FRAME_HEIGHT = (int) (screenDim.getHeight() * MAX_SCREEN_PERC_SIZE);
@@ -54,62 +58,62 @@ public class View{
 		if(screenDim.getWidth() * MAX_SCREEN_PERC_SIZE < FRAME_WIDTH){
 			FRAME_WIDTH = (int) (screenDim.getWidth() * MAX_SCREEN_PERC_SIZE);
 		}
-		
+
 		buttonPanel = new ButtonPanel();
 		setIsBuilt(false);
-		
+
 		c.fill = 1;
 		c.gridx = 1;
 		c.gridy = 1;
 		c.weightx = 1;
 		c.weighty = 1;
 		frame.add(buttonPanel, c);
-		
+
 		Dimension minCodeDim = new Dimension(DEF_CODE_AREA_WIDTH, 0);
-		
+
 		codePanel = new CodePanel();
 		codePanel.setMinimumSize(minCodeDim);
-		
+
 		Dimension minRMDim = new Dimension(REGISTER_WIDTH+MEM_CELL_WIDTH+50, 0);
-		
+
 		rmPanel = new RMPanel();
 		rmPanel.setMinimumSize(minRMDim);
-		
+
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, codePanel, rmPanel);
 		splitPane.setDividerLocation(DEF_CODE_AREA_WIDTH);
 		c.weighty = 100;
 		c.gridy = 2;
 		frame.add(splitPane, c);
-		
+
 		frame.setVisible(true);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		frame.setMinimumSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
 		frame.setLocationRelativeTo(null);
 	}
-	
+
 	public void setRegisters(){
 		rmPanel.setRegisters();
 	}
-	
+
 	public void setMemoryCells(){
 		rmPanel.setMemoryCells();
 	}
-	
+
 	public void updateValues(final int reg, final int source, final byte mode, final byte opType){
 		EventQueue.invokeLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				rmPanel.updateValues(reg, source, mode, opType);
-				
+
 			}
 		});
 	}
-	
+
 	public void updateRegister(int index){
 		rmPanel.updateRegister(index);
 	}
-	
+
 	public void updateMemCell(int index){
 		rmPanel.updateMemCell(index);
 	}
@@ -117,19 +121,25 @@ public class View{
 	public void resetLastEdited() {
 		rmPanel.resetLastEdited();
 	}
-	
+
 	public void highlightLine(int index){
 		codePanel.highlightLine(index);
 	}
-	
+
 	public void setIsBuilt(boolean built){
 		if(!running && !built){
-			buttonPanel.setRunStepButtonsEnabled(false);
+			setRunStepButtonsEnabled(false);
 		}else{
-			buttonPanel.setRunStepButtonsEnabled(true);
+			setRunStepButtonsEnabled(true);
 		}
 	}
-	
+
+	private void setRunStepButtonsEnabled(boolean e){
+		setButtonState(Button.RUN, e);
+		setButtonState(Button.STEP, e);
+		setButtonState(Button.BACKSTEP, e);
+	}
+
 	public void build(){
 		Engine.current.buildDirectivesFromString(codePanel.getDirectives());
 		Engine.current.buildOrdersFromString(codePanel.getOrders());
@@ -137,13 +147,27 @@ public class View{
 		Engine.current.pause();
 		setRunning(false);
 	}
-	
+
 	public boolean isRunning(){
 		return running;
 	}
-	
+
 	public void setRunning(boolean running){
 		this.running = running;
 		buttonPanel.setRunButtonImg(running ? 2 : 1);
+		setButtons_Running(!running);
+		codePanel.setCodeAreasEnabled(!running);
+	}
+
+	private void setButtons_Running(boolean b){
+		setButtonState(Button.STEP, b);
+		setButtonState(Button.BACKSTEP, b);
+		setButtonState(Button.BUILD, b);
+		setButtonState(Button.LOAD, b);
+		setButtonState(Button.SAVE, b);
+	}
+
+	public void setButtonState(Button button, boolean state){
+		buttonPanel.setButtonState(button, state);
 	}
 }

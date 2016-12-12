@@ -21,7 +21,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 	@Override
 	public void insertString(int offset, String str, AttributeSet a){
 		try {
-			super.insertString(offset, str.toUpperCase(), a);
+			super.insertString(offset, str.toUpperCase().replace(';', ':'), a);
 			invalidateBuild();
 			recalculateStyles();
 			numHeader.updateHeader(dFont);
@@ -29,7 +29,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void remove(int offset, int length){
 		try {
@@ -41,7 +41,7 @@ public abstract class ColorStyledDocument extends DefaultStyledDocument {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public abstract void recalculateStyles();
 	protected void invalidateBuild(){
 		View.Instance.setIsBuilt(false);
