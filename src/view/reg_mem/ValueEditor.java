@@ -179,7 +179,7 @@ public class ValueEditor {
 				if(isRegister){
 					Engine.current.setReg(index, Integer.parseInt(textFields[1].getText()));
 				}else{
-					Engine.current.setVar(index*4 + 1024, Integer.parseInt(textFields[1].getText()));
+					Engine.current.setVar(index, Integer.parseInt(textFields[1].getText()));
 				}
 				valueFrame.dispose();
 			}
@@ -200,7 +200,7 @@ public class ValueEditor {
 		layout.putConstraint(SOUTH, cancelButton, -VERT_PAD, SOUTH, valueFrame.getContentPane());
 		layout.putConstraint(HORIZONTAL_CENTER, cancelButton, DIALOG_WIDTH*3/4, WEST, valueFrame.getContentPane());
 		
-		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVarFromAdress(index*4 + 1024)) + "");
+		decTextField.setText((isRegister ? Engine.current.getReg(index) : Engine.current.getVar(index)) + "");
 		
 		valueFrame.setTitle(title);
 		Dimension minSize = new Dimension(DIALOG_WIDTH, DIALOG_HEIGHT);

@@ -20,6 +20,23 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
+		//@mrwasp
+		ImageButton saveButton = new ImageButton("save", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//TODO save
+			}
+		});
+		ImageButton loadButton = new ImageButton("load", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//TODO load
+			}
+		});
+		
+		
+		
+		
 		ImageButton buildButton = new ImageButton("build", new ActionListener() {
 			
 			@Override
@@ -57,11 +74,22 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			}
 		});
 		
+		//@mrwasp
+		ImageButton backStepButton = new ImageButton("backstep", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.backStep();
+			}
+		});
+		
+		super.add(saveButton);
+		super.add(loadButton);
 		super.add(buildButton);
 		super.add(timeSlider);
 		super.add(runInfoLabel);
 		super.add(runButton);
 		super.add(stepButton);
+		super.add(backStepButton);
 	}
 	
 	@Override
