@@ -25,19 +25,19 @@ public class CodePanel extends JPanel{
 		DirStyledDocument dirSDoc = new DirStyledDocument(dirNumHeader);
 		dirPane.setStyledDocument(dirSDoc);
 		CodeArea dirArea = new CodeArea("Directives:", dirPane, dirNumHeader);
-		
+
 		ordersPane = new JTextPane();
 		NumHeader orderNumHeader = new NumHeader(ordersPane);
 		orderSDoc = new OrderStyledDocument(orderNumHeader);
 		ordersPane.setStyledDocument(orderSDoc);
 		CodeArea orderArea = new CodeArea("Orders:", ordersPane, orderNumHeader);
-		
+
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, dirArea, orderArea);
 		splitPane.setDividerLocation(View.DEFAULT_DIR_PANE_HEIGHT);
 		splitPane.setOneTouchExpandable(true);
 		add(splitPane);
 	}
-	
+
 	public String getDirectives(){
 		Document d = dirPane.getDocument();
 		String out = "";
@@ -48,7 +48,7 @@ public class CodePanel extends JPanel{
 		}
 		return out;
 	}
-	
+
 	public String getOrders(){
 		Document d = ordersPane.getDocument();
 		String out = "";
@@ -59,8 +59,13 @@ public class CodePanel extends JPanel{
 		}
 		return out;
 	}
-	
+
 	public void highlightLine(int index){
 		orderSDoc.highlightLine(index);
+	}
+
+	public void setCodeAreasEnabled(boolean b){
+		dirPane.setEditable(b);
+		ordersPane.setEditable(b);
 	}
 }

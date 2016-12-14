@@ -3,6 +3,7 @@ package view.reg_mem;
 import java.awt.event.MouseEvent;
 
 import core.Engine;
+import view.View;
 
 public class MemoryCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
@@ -13,22 +14,22 @@ public class MemoryCell extends EditableCell {
 		this.index = index;
 		setupLabels();
 	}
-	
+
 	@Override
 	protected int getValue() {
-		return Engine.current.getVarFromAdress((index * 4) + 1024);
+		return Engine.current.getVar(index);
 	}
 
 	@Override
 	protected String getLabel() {
-		String label = Engine.current.getVarLabel((index * 4) + 1024);
-		return (index * 4) + 1024 + (label.equals("") ? "" : " (" + label + ")");
+		String label = Engine.current.getVarLabel(index);
+		return Engine.current.getVarAddress(index) + (label.equals("") ? "" : " (" + label + ")");
 	}
-	
+
 	public void setTopX(int newX){
 		this.topX = newX;
 	}
-	
+
 	public void setTopY(int newY){
 		this.topY = newY;
 	}
@@ -39,8 +40,10 @@ public class MemoryCell extends EditableCell {
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		ValueEditor.displayCellValue(index, label);
+	public void mouseClicked(MouseEvent e) {
+		if (!View.Instance.isRunning()) {
+			ValueEditor.displayCellValue(index, label);
+		}
 	}
 
 }

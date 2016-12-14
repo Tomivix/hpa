@@ -20,15 +20,16 @@ import view.View;
 
 public class ImageButton extends JComponent implements MouseListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final static byte ENABLED = 0, DISABLED = 1, HOVERED = 2;
-	
+
 	private int width = 10, height = 10;
 	protected Image disImg, enImg, hovImg;
 	private byte currState = ENABLED;
 	private AffineTransform scaleTransform;
 	private ActionListener clickListener;
 	private String name;
+	private Cursor handCursor, pointCursor;
 	public ImageButton(String name, ActionListener clickListener) {
 		this.name = name;
 		this.clickListener = clickListener;
@@ -46,19 +47,21 @@ public class ImageButton extends JComponent implements MouseListener {
 		width = (int) (disImg.getWidth(null) * View.IMAGE_BUTTON_SCALE);
 		height = (int) (disImg.getHeight(null) * View.IMAGE_BUTTON_SCALE);
 		super.addMouseListener(this);
-		super.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		handCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+		pointCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		super.setCursor(handCursor);
 	}
-	
+
 	@Override
 	public Dimension getPreferredSize(){
 		return new Dimension(width, height);
 	}
-	
+
 	@Override
 	public void paint(Graphics g){
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		
+
 		Image imgToDraw = disImg;
 		switch(currState){
 		case ENABLED:
@@ -96,9 +99,10 @@ public class ImageButton extends JComponent implements MouseListener {
 		}
 		repaint();
 	}
-	
+
 	public void setEnabled(boolean enabled){
 		currState = enabled ? ENABLED : DISABLED;
+		super.setCursor(enabled ? handCursor : pointCursor);
 		repaint();
 	}
 
@@ -107,5 +111,5 @@ public class ImageButton extends JComponent implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {}
-	
+
 }

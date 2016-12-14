@@ -3,6 +3,7 @@ package view.reg_mem;
 import java.awt.event.MouseEvent;
 
 import core.Engine;
+import view.View;
 
 public class RegisterCell extends EditableCell {
 	private static final long serialVersionUID = 1L;
@@ -13,7 +14,7 @@ public class RegisterCell extends EditableCell {
 		isRegister = true;
 		setupLabels();
 	}
-	
+
 	@Override
 	protected int getValue() {
 		return Engine.current.getReg(index);
@@ -21,7 +22,7 @@ public class RegisterCell extends EditableCell {
 
 	@Override
 	protected String getLabel() {
-		
+
 		return index+":";
 	}
 
@@ -32,9 +33,11 @@ public class RegisterCell extends EditableCell {
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		ValueEditor.displayRegisterValue(index);
+		if (!View.Instance.isRunning()) {
+			ValueEditor.displayRegisterValue(index);
+		}
 	}
-	
-	
+
+
 
 }

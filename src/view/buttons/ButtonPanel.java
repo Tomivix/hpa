@@ -1,5 +1,6 @@
 package view.buttons;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,23 +12,42 @@ import javax.swing.event.ChangeListener;
 
 import core.Engine;
 import view.View;
+import view.View.Button;
 
 public class ButtonPanel extends JPanel implements ChangeListener{
 	private static final long serialVersionUID = 1L;
 
 	private ChangeableImageButton runButton;
-	ImageButton stepButton;
+	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton;
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
-		ImageButton buildButton = new ImageButton("build", new ActionListener() {
-			
+		super.setLayout(new BorderLayout());
+		//@mrwasp
+		saveButton = new ImageButton("save", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//TODO save
+			}
+		});
+		loadButton = new ImageButton("load", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//TODO load
+			}
+		});
+
+
+
+
+		buildButton = new ImageButton("build", new ActionListener() {
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				View.Instance.build();
 			}
 		});
-		
+
 		runButton = new ChangeableImageButton("run", "pause", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -39,7 +59,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 				}
 			}
 		});
-		
+
 		timeSlider = new JSlider(JSlider.HORIZONTAL, 0, View.SLIDER_MAX_VAL, View.SLIDER_MIN_VAL);
 		timeSlider.setMinorTickSpacing(View.SLIDER_MIN_VAL);
 		timeSlider.setMajorTickSpacing(10 * View.SLIDER_MIN_VAL);
@@ -47,35 +67,74 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		timeSlider.setSnapToTicks(true);
 		timeSlider.setPaintLabels(true);
 		timeSlider.addChangeListener(this);
-		
+
 		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
-		
+
 		stepButton = new ImageButton("step", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.step();
 			}
 		});
-		
-		super.add(buildButton);
-		super.add(timeSlider);
-		super.add(runInfoLabel);
-		super.add(runButton);
-		super.add(stepButton);
+
+		//@mrwasp
+		backstepButton = new ImageButton("backstep", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Engine.current.backStep();
+			}
+		});
+
+		JPanel leftPane = new JPanel();
+		JPanel centerPane = new JPanel();
+		JPanel rightPane = new JPanel();
+
+		leftPane.add(saveButton);
+		leftPane.add(loadButton);
+		leftPane.add(buildButton);
+
+		centerPane.add(timeSlider);
+		centerPane.add(runInfoLabel);
+
+		rightPane.add(backstepButton);
+		rightPane.add(runButton);
+		rightPane.add(stepButton);
+
+		super.add(leftPane, BorderLayout.LINE_START);
+		super.add(centerPane, BorderLayout.CENTER);
+		super.add(rightPane, BorderLayout.LINE_END);
 	}
-	
+
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		Engine.current.setRunInterval(timeSlider.getValue());
 		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL + "ms");
 	}
-	
-	public void setRunStepButtonsEnabled(boolean e){
-		runButton.setEnabled(e);
-		stepButton.setEnabled(e);
-	}
-	
+
 	public void setRunButtonImg(int index){
 		runButton.setImage(index);
+	}
+
+	public void setButtonState(Button button, boolean state){
+		switch(button){
+		case LOAD:
+			loadButton.setEnabled(state);
+			break;
+		case SAVE:
+			saveButton.setEnabled(state);
+			break;
+		case BUILD:
+			buildButton.setEnabled(state);
+			break;
+		case STEP:
+			stepButton.setEnabled(state);
+			break;
+		case RUN:
+			runButton.setEnabled(state);
+			break;
+		case BACKSTEP:
+			backstepButton.setEnabled(state);
+			break;
+		}
 	}
 }

@@ -12,7 +12,7 @@ import view.code.NumHeader;
 
 public class OrderStyledDocument extends ColorStyledDocument {
 	private static final long serialVersionUID = 1L;
-	
+
 	private AttributeSet defStyle, labelStyle, orderStyle, paramStyle, invStyle;
 	private AttributeSet defBg, highBg;
 	private Color defC = Color.BLACK,
@@ -35,7 +35,7 @@ public class OrderStyledDocument extends ColorStyledDocument {
 		dFont = cont.getFont(defStyle);
 		numHeader.updateHeader(dFont);
 	}
-	
+
 	public void recalculateStyles(){
 		try{
 			super.setCharacterAttributes(0, super.getLength(), defStyle, true);
@@ -54,16 +54,16 @@ public class OrderStyledDocument extends ColorStyledDocument {
 			for(int i = 0; i < indexes[3].length; i++){
 				super.setCharacterAttributes(indexes[3][i], indexes[3][++i], invStyle, true);
 			}
-			
+
 		}catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void highlightLine(int index){
 		try {
 			int startI = 0, endI = 0;
-			char[] chars = super.getText(0, super.getLength()).toCharArray();
+			char[] chars = (super.getText(0, super.getLength()) + "\n").toCharArray();
 			for(int i = 0, j = 0; j < chars.length && i < index; j++){
 				if(chars[j] == '\n'){
 					i++;
