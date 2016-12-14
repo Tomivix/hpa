@@ -1,5 +1,6 @@
 package view.buttons;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +22,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
+		super.setLayout(new BorderLayout());
 		//@mrwasp
 		saveButton = new ImageButton("save", new ActionListener() {
 			@Override
@@ -83,14 +85,24 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			}
 		});
 
-		super.add(saveButton);
-		super.add(loadButton);
-		super.add(buildButton);
-		super.add(timeSlider);
-		super.add(runInfoLabel);
-		super.add(runButton);
-		super.add(stepButton);
-		super.add(backstepButton);
+		JPanel leftPane = new JPanel();
+		JPanel centerPane = new JPanel();
+		JPanel rightPane = new JPanel();
+
+		leftPane.add(saveButton);
+		leftPane.add(loadButton);
+		leftPane.add(buildButton);
+
+		centerPane.add(timeSlider);
+		centerPane.add(runInfoLabel);
+
+		rightPane.add(backstepButton);
+		rightPane.add(runButton);
+		rightPane.add(stepButton);
+
+		super.add(leftPane, BorderLayout.LINE_START);
+		super.add(centerPane, BorderLayout.CENTER);
+		super.add(rightPane, BorderLayout.LINE_END);
 	}
 
 	@Override
