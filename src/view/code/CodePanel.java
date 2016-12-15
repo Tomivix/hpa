@@ -60,6 +60,14 @@ public class CodePanel extends JPanel{
 		return out;
 	}
 
+	public void setDirectives(String code) {
+		dirPane.setText(code);
+	}
+
+	public void setOrders(String code) {
+		ordersPane.setText(code);
+	}
+
 	public void highlightLine(int index){
 		orderSDoc.highlightLine(index);
 	}
