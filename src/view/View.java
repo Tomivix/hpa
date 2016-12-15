@@ -54,7 +54,7 @@ public class View{
 	public View(){
 		Instance = this;
 
-		frame = new JFrame("HPA");
+		frame = new JFrame("HPA Studio 0.9.9");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -188,7 +188,7 @@ public class View{
 				file = new File(fileChooser.getSelectedFile() + ".hpa");
 			PrintWriter writer = new PrintWriter(file);
 			String directives = codePanel.getDirectives(), orders = codePanel.getOrders();
-			writer.println(directives); writer.println("<<<SEPARATOR>>");
+			writer.println(directives); writer.println("<<<SEPARATOR>>>");
 			writer.println(orders); writer.close();
 		}
 	}
