@@ -3,6 +3,8 @@ package view.buttons;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,17 +29,24 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		saveButton = new ImageButton("save", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO save
+				try {
+					View.Instance.save();
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
+
 		loadButton = new ImageButton("load", new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO load
+				try {
+					View.Instance.load();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
-
-
 
 
 		buildButton = new ImageButton("build", new ActionListener() {

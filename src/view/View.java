@@ -1,7 +1,9 @@
 package view;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.Engine;
 import view.buttons.ButtonPanel;
@@ -13,6 +15,12 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
 public class View{
@@ -46,7 +54,7 @@ public class View{
 	public View(){
 		Instance = this;
 
-		frame = new JFrame("HPA");
+		frame = new JFrame("HPA Studio 0.9.9");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -169,5 +177,33 @@ public class View{
 
 	public void setButtonState(Button button, boolean state){
 		buttonPanel.setButtonState(button, state);
+	}
+
+	public void save() throws FileNotFoundException {
+		JFileChooser fileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+		fileChooser.setFileFilter(new FileNameExtensionFilter("HPA source code", "hpa"));
+		if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+			File file = fileChooser.getSelectedFile();
+			if(!fileChooser.getSelectedFile().getAbsolutePath().endsWith(".hpa"))
+				file = new File(fileChooser.getSelectedFile() + ".hpa");
+			PrintWriter writer = new PrintWriter(file);
+			String directives = codePanel.getDirectives(), orders = codePanel.getOrders();
+			writer.println(directives); writer.println("<<<SEPARATOR>>>");
+			writer.println(orders); writer.close();
+		}
+	}
+
+	public void load() throws IOException {
+		JFileChooser fileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+		fileChooser.setFileFilter(new FileNameExtensionFilter("HPA source code", "hpa"));
+		while (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+			if(!fileChooser.getSelectedFile().getAbsolutePath().endsWith(".hpa")) continue;
+			File file = fileChooser.getSelectedFile(); String line = "", raw = "";
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+			while((line = bufferedReader.readLine()) != null) raw += line + '\n';
+			String[] code = raw.split("<<<SEPARATOR>>>"); if(code.length != 2) continue; 
+			codePanel.setDirectives(code[0]); codePanel.setOrders(code[1].trim());
+			bufferedReader.close();	break;
+		}
 	}
 }
