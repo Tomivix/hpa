@@ -8,13 +8,20 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import core.Engine;
 import view.buttons.ButtonPanel;
 import view.code.CodePanel;
+import view.drag_area.DragAreaDialog;
 import view.reg_mem.RMPanel;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,18 +50,75 @@ public class View{
 	public static final int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public static final int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	public static final int DEF_CODE_AREA_WIDTH = 300;
+	public static final int DRAG_AREA_BUTTON_WIDTH = 50, DRAG_AREA_WIDTH = 100;
+	public static final int DRAG_AREA_HOR_PAD = 8, DRAG_AREA_VERT_PAD = 30, DRAG_AREA_HEIGHT_PAD = 10;
 
 	public static int MEM_CELL_COL_COUNT = 5;
 
+	private DragAreaDialog dragDialog;
 	private JFrame frame;
 	private CodePanel codePanel;
 	private RMPanel rmPanel;
 	private ButtonPanel buttonPanel;
-	private boolean running = false;
+	private boolean running = false, dragDialogShown = false;
 	public View(){
 		Instance = this;
 
 		frame = new JFrame("HPA Studio 0.9.9");
+		dragDialog = new DragAreaDialog();
+
+		frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowActivated(WindowEvent e) {
+				if(dragDialogShown)
+					dragDialog.toFront();
+			}
+			@Override
+			public void windowIconified(WindowEvent e) {
+				hideDragDialog();
+			}
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+			@Override
+			public void windowOpened(WindowEvent e) {}
+			@Override
+			public void windowClosing(WindowEvent e) {}
+			@Override
+			public void windowClosed(WindowEvent e) {}
+		});
+		frame.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				if(dragDialogShown)
+					dragDialog.setVisible(true);
+			}
+			@Override
+			public void componentResized(ComponentEvent e) {
+				Dimension d = e.getComponent().getSize();
+				d.height -= buttonPanel.getSize().getHeight() + DRAG_AREA_VERT_PAD + DRAG_AREA_HEIGHT_PAD;
+				d.width = DRAG_AREA_WIDTH;
+				dragDialog.setSize(d);
+				if(dragDialogShown){
+					showDragDialog();
+				}
+			}
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				Component frame = e.getComponent();
+				Point p = frame.getLocation();
+				p.translate((p.x > DRAG_AREA_WIDTH ? -dragDialog.getWidth() : DRAG_AREA_BUTTON_WIDTH + 2) + DRAG_AREA_HOR_PAD, (int) buttonPanel.getSize().getHeight() + DRAG_AREA_VERT_PAD);
+				dragDialog.setLocation(p);
+			}
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				if(dragDialogShown)
+					dragDialog.setVisible(false);
+			}
+		});
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -201,9 +265,27 @@ public class View{
 			File file = fileChooser.getSelectedFile(); String line = "", raw = "";
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 			while((line = bufferedReader.readLine()) != null) raw += line + '\n';
-			String[] code = raw.split("<<<SEPARATOR>>>"); if(code.length != 2) continue; 
+			String[] code = raw.split("<<<SEPARATOR>>>"); if(code.length != 2) continue;
 			codePanel.setDirectives(code[0]); codePanel.setOrders(code[1].trim());
 			bufferedReader.close();	break;
 		}
+	}
+
+	public void showDragDialog(){
+		setDialogStatus(false);
+	}
+
+	public void hideDragDialog(){
+		setDialogStatus(true);
+	}
+
+	private void setDialogStatus(boolean hidden){
+		dragDialog.setVisible(!hidden);
+		dragDialogShown = !hidden;
+		codePanel.setDragAreaButtonText(hidden);
+	}
+
+	public boolean isDragDialogShown(){
+		return dragDialogShown;
 	}
 }
