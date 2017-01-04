@@ -11,6 +11,7 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import view.FlagRegister;
 import view.View;
 
 public class Engine implements ActionListener {
@@ -126,6 +127,7 @@ public class Engine implements ActionListener {
 
 	public void setFlag(int value){
 		flag = (value > 0) ? POSITIVE : (value < 0) ? NEGATIVE : ZERO;
+		View.Instance.setFlagRegisterState((value > 0) ? FlagRegister.STATE.P : (value < 0) ? FlagRegister.STATE.N : FlagRegister.STATE.Z);
 	}
 
 	//replaced functions

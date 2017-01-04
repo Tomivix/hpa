@@ -13,12 +13,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import core.Engine;
+import view.FlagRegister;
 import view.View;
 import view.View.Button;
 
 public class ButtonPanel extends JPanel implements ChangeListener{
 	private static final long serialVersionUID = 1L;
 
+	private FlagRegister flagRegister;
 	private ChangeableImageButton runButton;
 	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton;
 	private JSlider timeSlider;
@@ -105,6 +107,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		centerPane.add(timeSlider);
 		centerPane.add(runInfoLabel);
 
+		rightPane.add(flagRegister = new FlagRegister());
 		rightPane.add(backstepButton);
 		rightPane.add(runButton);
 		rightPane.add(stepButton);
@@ -145,5 +148,9 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			backstepButton.setEnabled(state);
 			break;
 		}
+	}
+
+	public void setFlagRegisterState(FlagRegister.STATE state){
+		flagRegister.setState(state);
 	}
 }

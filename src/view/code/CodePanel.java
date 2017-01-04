@@ -1,9 +1,9 @@
 package view.code;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+//import java.awt.event.ActionEvent;
+//import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
+//import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
@@ -22,7 +22,7 @@ public class CodePanel extends JPanel{
 
 	JTextPane dirPane, ordersPane;
 	OrderStyledDocument orderSDoc;
-	JButton dragAreaButton;
+//	JButton dragAreaButton;
 	public CodePanel(){
 		super();
 		SpringLayout layout;
@@ -44,28 +44,28 @@ public class CodePanel extends JPanel{
 		splitPane.setDividerLocation(View.DEFAULT_DIR_PANE_HEIGHT);
 		splitPane.setOneTouchExpandable(true);
 
-		dragAreaButton = new JButton("\u2190");
-
-		dragAreaButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(View.Instance.isDragDialogShown()){
-					View.Instance.hideDragDialog();
-				}else{
-					View.Instance.showDragDialog();
-				}
-			}
-		});
-
-		add(dragAreaButton);
+//		dragAreaButton = new JButton("\u2190");
+//
+//		dragAreaButton.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				if(View.Instance.isDragDialogShown()){
+//					View.Instance.hideDragDialog();
+//				}else{
+//					View.Instance.showDragDialog();
+//				}
+//			}
+//		});
+//
+//		add(dragAreaButton);
 		add(splitPane);
 
-		layout.putConstraint(WEST, dragAreaButton, 0, WEST, this);
-		layout.putConstraint(EAST, dragAreaButton, View.DRAG_AREA_BUTTON_WIDTH, WEST, dragAreaButton);
-		layout.putConstraint(NORTH, dragAreaButton, 0, NORTH, this);
-		layout.putConstraint(SOUTH, dragAreaButton, 0, SOUTH, this);
+//		layout.putConstraint(WEST, dragAreaButton, 0, WEST, this);
+//		layout.putConstraint(EAST, dragAreaButton, View.DRAG_AREA_BUTTON_WIDTH, WEST, dragAreaButton);
+//		layout.putConstraint(NORTH, dragAreaButton, 0, NORTH, this);
+//		layout.putConstraint(SOUTH, dragAreaButton, 0, SOUTH, this);
 
-		layout.putConstraint(WEST, splitPane, 0, EAST, dragAreaButton);
+		layout.putConstraint(WEST, splitPane, 0, WEST, this);
 		layout.putConstraint(EAST, splitPane, 0, EAST, this);
 		layout.putConstraint(NORTH, splitPane, 0, NORTH, this);
 		layout.putConstraint(SOUTH, splitPane, 0, SOUTH, this);
@@ -110,7 +110,7 @@ public class CodePanel extends JPanel{
 		ordersPane.setEditable(b);
 	}
 
-	public void setDragAreaButtonText(boolean left){
-		dragAreaButton.setText(left ? "\u2190" : "\u2192");
-	}
+//	public void setDragAreaButtonText(boolean left){
+//		dragAreaButton.setText(left ? "\u2190" : "\u2192");
+//	}
 }

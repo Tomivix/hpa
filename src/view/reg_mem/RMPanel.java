@@ -22,7 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 
-public class RMPanel extends JPanel implements ComponentListener, AdjustmentListener, MouseListener {
+public class RMPanel extends JPanel implements ComponentListener, AdjustmentListener, MouseListener{
 	private static final long serialVersionUID = 1L;
 
 	private SpringLayout layout;
@@ -56,7 +56,7 @@ public class RMPanel extends JPanel implements ComponentListener, AdjustmentList
 
 		memoryPanel = new MemoryPanel();
 		memScrollPane = new JScrollPane(memoryPanel);
-		memScrollPane.getVerticalScrollBar().addAdjustmentListener(this);
+//		memScrollPane.getVerticalScrollBar().addAdjustmentListener(this);
 		memScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		memScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		memScrollPane.getVerticalScrollBar().setUnitIncrement(View.MEM_CELL_HEIGHT);
