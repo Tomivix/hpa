@@ -1,6 +1,7 @@
 package view.buttons;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -14,6 +15,7 @@ import javax.swing.event.ChangeListener;
 
 import core.Engine;
 import view.FlagRegister;
+import view.HelpDialog;
 import view.View;
 import view.View.Button;
 
@@ -80,6 +82,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		timeSlider.addChangeListener(this);
 
 		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
+		runInfoLabel.setPreferredSize(new Dimension(110, 50));
 
 		stepButton = new ImageButton("step", new ActionListener() {
 			@Override
@@ -93,6 +96,14 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Engine.current.backStep();
+			}
+		});
+
+		ImageButton helpButton = new ImageButton("help", new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HelpDialog.show();
 			}
 		});
 
@@ -111,6 +122,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		rightPane.add(backstepButton);
 		rightPane.add(runButton);
 		rightPane.add(stepButton);
+		rightPane.add(helpButton);
 
 		super.add(leftPane, BorderLayout.LINE_START);
 		super.add(centerPane, BorderLayout.CENTER);
