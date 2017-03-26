@@ -177,11 +177,11 @@ public class View{
 	public void setRunning(boolean running){
 		this.running = running;
 		buttonPanel.setRunButtonImg(running ? 2 : 1);
-		setButtons_Running(!running);
+		setButtons_State(!running);
 		codePanel.setCodeAreasEnabled(!running);
 	}
 
-	private void setButtons_Running(boolean b){
+	private void setButtons_State(boolean b){
 		setButtonState(Button.STEP, b);
 		setButtonState(Button.BACKSTEP, b);
 		setButtonState(Button.BUILD, b);

@@ -1,12 +1,12 @@
 package view.buttons;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -82,7 +82,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		timeSlider.addChangeListener(this);
 
 		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
-		runInfoLabel.setPreferredSize(new Dimension(110, 50));
+		runInfoLabel.setAlignmentX(CENTER_ALIGNMENT);
 
 		stepButton = new ImageButton("step", new ActionListener() {
 			@Override
@@ -109,6 +109,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 
 		JPanel leftPane = new JPanel();
 		JPanel centerPane = new JPanel();
+		centerPane.setLayout(new BoxLayout(centerPane, BoxLayout.PAGE_AXIS));
 		JPanel rightPane = new JPanel();
 
 		leftPane.add(saveButton);
@@ -132,7 +133,9 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		Engine.current.setRunInterval(timeSlider.getValue());
-		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL + "ms");
+		runInfoLabel.setText("Step every " +
+				Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL +
+				"ms");
 	}
 
 	public void setRunButtonImg(int index){
