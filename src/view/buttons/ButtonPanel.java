@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -13,14 +14,17 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import core.Engine;
+import view.FlagRegister;
+import view.HelpDialog;
 import view.View;
 import view.View.Button;
 
 public class ButtonPanel extends JPanel implements ChangeListener{
 	private static final long serialVersionUID = 1L;
 
+	private FlagRegister flagRegister;
 	private ChangeableImageButton runButton;
-	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton;
+	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton, calculateButton;
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
@@ -62,9 +66,9 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			public void actionPerformed(ActionEvent e) {
 				View.Instance.setRunning(!View.Instance.isRunning());
 				if(View.Instance.isRunning()){
-					Engine.current.run();
+					View.Instance.run();
 				}else{
-					Engine.current.pause();
+					View.Instance.pause();
 				}
 			}
 		});
@@ -78,6 +82,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		timeSlider.addChangeListener(this);
 
 		runInfoLabel = new JLabel("Step every " + timeSlider.getValue() + "ms");
+		runInfoLabel.setAlignmentX(CENTER_ALIGNMENT);
 
 		stepButton = new ImageButton("step", new ActionListener() {
 			@Override
@@ -93,11 +98,28 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 				Engine.current.backStep();
 			}
 		});
+		
+		calculateButton = new ImageButton("calculate", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				View.Instance.calculate();
+			}
+		});
+
+		ImageButton helpButton = new ImageButton("help", new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HelpDialog.show();
+			}
+		});
 
 		JPanel leftPane = new JPanel();
 		JPanel centerPane = new JPanel();
+		centerPane.setLayout(new BoxLayout(centerPane, BoxLayout.PAGE_AXIS));
 		JPanel rightPane = new JPanel();
 
+		leftPane.add(helpButton);
 		leftPane.add(saveButton);
 		leftPane.add(loadButton);
 		leftPane.add(buildButton);
@@ -105,9 +127,11 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		centerPane.add(timeSlider);
 		centerPane.add(runInfoLabel);
 
+		rightPane.add(flagRegister = new FlagRegister());
 		rightPane.add(backstepButton);
 		rightPane.add(runButton);
 		rightPane.add(stepButton);
+		rightPane.add(calculateButton);
 
 		super.add(leftPane, BorderLayout.LINE_START);
 		super.add(centerPane, BorderLayout.CENTER);
@@ -116,8 +140,10 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		Engine.current.setRunInterval(timeSlider.getValue());
-		runInfoLabel.setText("Step every " + Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL + "ms");
+		View.Instance.setRunInterval(timeSlider.getValue());
+		runInfoLabel.setText("Step every " +
+				Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL +
+				"ms");
 	}
 
 	public void setRunButtonImg(int index){
@@ -144,6 +170,14 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		case BACKSTEP:
 			backstepButton.setEnabled(state);
 			break;
+		case CALCULATE:
+			calculateButton.setEnabled(state);
+			break;
+			
 		}
+	}
+
+	public void setFlagRegisterState(FlagRegister.STATE state){
+		flagRegister.setState(state);
 	}
 }

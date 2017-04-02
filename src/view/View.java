@@ -3,6 +3,7 @@ package view;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.Engine;
@@ -15,6 +16,8 @@ import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,9 +26,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 
-public class View{
+public class View implements ActionListener{
 	public static enum Button{
-		SAVE, LOAD, BUILD, STEP, BACKSTEP, RUN
+		SAVE, LOAD, BUILD, STEP, BACKSTEP, RUN, CALCULATE
 	}
 
 	public static final byte RR = 0, MR = 1, RM = 2;
@@ -33,7 +36,10 @@ public class View{
 
 	public static View Instance;
 
-	public static int FRAME_WIDTH = 890, FRAME_HEIGHT = 780;
+	public static final String APP_NAME = "HPA Studio 0.9.9";
+	public static final String HELP_TEXT = "<html><p>"+APP_NAME+"</p><p>Credits:<br>The £AJT Group:<ul><li>Project Manager: Tomasz Kury³owicz</li><li>GUI Designer: Andrzej Lamecki</li><li>Engine Programmers: Tomasz Kury³owicz<br> £ukasz Osowicki</li><li>Legal Managment: Joachim Kowalewski</li></ul></p><a href=\"http://github.com/Tomivix/hpa/wiki\">Go to "+APP_NAME+" Wiki</a></html>";
+
+	public static int FRAME_WIDTH = 890, FRAME_HEIGHT = 830;
 	public static final float MAX_SCREEN_PERC_SIZE = 0.9f;
 	public static double IMAGE_BUTTON_SCALE = 0.4;
 	public static final int SLIDER_MIN_VAL = 100, SLIDER_MAX_VAL = 20 * SLIDER_MIN_VAL;
@@ -43,6 +49,9 @@ public class View{
 	public static final int MEM_CELL_WIDTH = 200, MEM_CELL_HEIGHT = 30, MEM_CELL_VERT_PADDING = 10;
 	public static final int ARROW_WIDTH = 6, ARROW_LENGTH = MEM_CELL_VERT_PADDING/2+1;
 	public static final int DEF_CODE_AREA_WIDTH = 300;
+	public static final int DRAG_AREA_BUTTON_WIDTH = 50, DRAG_AREA_WIDTH = 100;
+	public static final int DRAG_AREA_HOR_PAD = 8, DRAG_AREA_VERT_PAD = 30, DRAG_AREA_HEIGHT_PAD = 10;
+	public static final int FLAG_REGISTER_WIDTH = 140, FLAG_REGISTER_HEIGHT = 50;
 
 	public static int MEM_CELL_COL_COUNT = 5;
 
@@ -51,10 +60,16 @@ public class View{
 	private RMPanel rmPanel;
 	private ButtonPanel buttonPanel;
 	private boolean running = false;
+	private Timer timer;
+	private int interval = 100;
+	
 	public View(){
 		Instance = this;
+		
+		timer = new Timer(interval, this);
 
-		frame = new JFrame("HPA Studio 0.9.9");
+		frame = new JFrame(APP_NAME);
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -146,14 +161,14 @@ public class View{
 		setButtonState(Button.RUN, e);
 		setButtonState(Button.STEP, e);
 		setButtonState(Button.BACKSTEP, e);
+		setButtonState(Button.CALCULATE, e);
 	}
 
 	public void build(){
-		Engine.current.buildDirectivesFromString(codePanel.getDirectives());
-		Engine.current.buildOrdersFromString(codePanel.getOrders());
-		setIsBuilt(true);
-		Engine.current.pause();
+		boolean built = Engine.current.buildFromString(codePanel.getDirectives(), codePanel.getOrders());
+		pause();
 		setRunning(false);
+		setIsBuilt(built);
 	}
 
 	public boolean isRunning(){
@@ -163,16 +178,17 @@ public class View{
 	public void setRunning(boolean running){
 		this.running = running;
 		buttonPanel.setRunButtonImg(running ? 2 : 1);
-		setButtons_Running(!running);
+		setButtons_State(!running);
 		codePanel.setCodeAreasEnabled(!running);
 	}
 
-	private void setButtons_Running(boolean b){
+	private void setButtons_State(boolean b){
 		setButtonState(Button.STEP, b);
 		setButtonState(Button.BACKSTEP, b);
 		setButtonState(Button.BUILD, b);
 		setButtonState(Button.LOAD, b);
 		setButtonState(Button.SAVE, b);
+		setButtonState(Button.CALCULATE, b);
 	}
 
 	public void setButtonState(Button button, boolean state){
@@ -201,9 +217,41 @@ public class View{
 			File file = fileChooser.getSelectedFile(); String line = "", raw = "";
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 			while((line = bufferedReader.readLine()) != null) raw += line + '\n';
-			String[] code = raw.split("<<<SEPARATOR>>>"); if(code.length != 2) continue; 
+			String[] code = raw.split("<<<SEPARATOR>>>"); if(code.length != 2) continue;
 			codePanel.setDirectives(code[0]); codePanel.setOrders(code[1].trim());
 			bufferedReader.close();	break;
+		}
+	}
+
+	public void setFlagRegisterState(FlagRegister.STATE state){
+		buttonPanel.setFlagRegisterState(state);
+	}
+
+	public JFrame getMainFrame(){
+		return frame;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+			Engine.current.step();
+	}
+	
+	public void setRunInterval(int interval){
+		this.interval = interval; timer.setDelay(interval);
+	}
+	
+	public void run(){
+		timer.start();
+	}
+
+	public void pause(){
+		timer.stop();
+	}
+	
+	public void calculate(){
+		setRunning(!View.Instance.isRunning());
+		while(running){
+			Engine.current.step();
 		}
 	}
 }

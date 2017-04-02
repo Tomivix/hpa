@@ -22,7 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
 
-public class RMPanel extends JPanel implements ComponentListener, AdjustmentListener, MouseListener {
+public class RMPanel extends JPanel implements ComponentListener, AdjustmentListener, MouseListener{
 	private static final long serialVersionUID = 1L;
 
 	private SpringLayout layout;
