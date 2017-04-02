@@ -3,25 +3,21 @@ package view;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.Engine;
 import view.buttons.ButtonPanel;
 import view.code.CodePanel;
-//import view.drag_area.DragAreaDialog;
 import view.reg_mem.RMPanel;
 
-//import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-//import java.awt.Point;
 import java.awt.Toolkit;
-//import java.awt.event.ComponentEvent;
-//import java.awt.event.ComponentListener;
-//import java.awt.event.WindowEvent;
-//import java.awt.event.WindowListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,9 +26,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 
-public class View{
+public class View implements ActionListener{
 	public static enum Button{
-		SAVE, LOAD, BUILD, STEP, BACKSTEP, RUN
+		SAVE, LOAD, BUILD, STEP, BACKSTEP, RUN, CALCULATE
 	}
 
 	public static final byte RR = 0, MR = 1, RM = 2;
@@ -64,8 +60,13 @@ public class View{
 	private RMPanel rmPanel;
 	private ButtonPanel buttonPanel;
 	private boolean running = false;
+	private Timer timer;
+	private int interval = 100;
+	
 	public View(){
 		Instance = this;
+		
+		timer = new Timer(interval, this);
 
 		frame = new JFrame(APP_NAME);
 
@@ -160,14 +161,14 @@ public class View{
 		setButtonState(Button.RUN, e);
 		setButtonState(Button.STEP, e);
 		setButtonState(Button.BACKSTEP, e);
+		setButtonState(Button.CALCULATE, e);
 	}
 
 	public void build(){
-		Engine.current.buildDirectivesFromString(codePanel.getDirectives());
-		Engine.current.buildOrdersFromString(codePanel.getOrders());
-		setIsBuilt(true);
-		Engine.current.pause();
+		boolean built = Engine.current.buildFromString(codePanel.getDirectives(), codePanel.getOrders());
+		pause();
 		setRunning(false);
+		setIsBuilt(built);
 	}
 
 	public boolean isRunning(){
@@ -187,6 +188,7 @@ public class View{
 		setButtonState(Button.BUILD, b);
 		setButtonState(Button.LOAD, b);
 		setButtonState(Button.SAVE, b);
+		setButtonState(Button.CALCULATE, b);
 	}
 
 	public void setButtonState(Button button, boolean state){
@@ -227,5 +229,29 @@ public class View{
 
 	public JFrame getMainFrame(){
 		return frame;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+			Engine.current.step();
+	}
+	
+	public void setRunInterval(int interval){
+		this.interval = interval; timer.setDelay(interval);
+	}
+	
+	public void run(){
+		timer.start();
+	}
+
+	public void pause(){
+		timer.stop();
+	}
+	
+	public void calculate(){
+		setRunning(!View.Instance.isRunning());
+		while(running){
+			Engine.current.step();
+		}
 	}
 }

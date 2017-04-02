@@ -1,20 +1,15 @@
 package core;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-
 import view.FlagRegister;
 import view.View;
 
-public class Engine implements ActionListener {
+public class Engine{
 	//const values
 	public static final int ZERO = 0, POSITIVE = 1, NEGATIVE = -1, ERROR = 3;
 	public static final int RR = 1, RM = 2, JUMP = 3;
@@ -34,9 +29,6 @@ public class Engine implements ActionListener {
 	private int currentOrder; //index of order, not address
 	private int flag;
 
-	private Timer timer;
-	private int interval = 100;
-
 	public Engine(){
 		current = this;
 		orders = new ArrayList<>();
@@ -53,15 +45,6 @@ public class Engine implements ActionListener {
 		currentOrder = 0;
 
 		flag = ERROR;
-
-		timer = new Timer(interval, this);
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				View v = new View();
-				v.setRegisters();
-			}
-		});
 	}
 
 	public int getReg(int id){
@@ -183,14 +166,23 @@ public class Engine implements ActionListener {
 			View.Instance.updateValues(vArg1, vArg2, vCmdType, vOpType);
 		}
 	}
+	
+	public boolean buildFromString(String directives, String orders){
+		boolean d = buildDirectivesFromString(directives), o = buildOrdersFromString(orders);
+		return d && o;
+	}
 
-	public void buildDirectivesFromString(String s){
+	private boolean buildDirectivesFromString(String s){
+		boolean result = true;
 		View.Instance.resetLastEdited();
 		vars.clear(); varLabels.clear();
 		String[] lines = s.split("\n");
 		for(String line : lines){
 			int res[][] = Parser.getPos(line, true);
-			if(res[1][0] < 0) System.out.println("Invalid syntax: " + line);
+			if(res[1][0] < 0){
+				System.out.println("Invalid syntax: " + line);
+				result = false;
+			}
 			else {
 				String label = line.substring(res[0][0], res[0][1] + 1);
 				String arg1 = (res[2][0] < 0) ? null : line.substring(res[2][0], res[2][1] + 1);
@@ -208,15 +200,20 @@ public class Engine implements ActionListener {
 			}
 		}
 		View.Instance.setMemoryCells();
+		return result;
 	}
 
-	public void buildOrdersFromString(String s){
+	private boolean buildOrdersFromString(String s){
+		boolean result = true;
 		int address = currentOrder = 0;
 		orders.clear(); orderLabels.clear(); orderIndexes.clear(); history.clear();
 		String[] lines = s.split("\n");
 		for(String line : lines){
 			int res[][] = Parser.getPos(line, false);
-			if(res[1][0] < 0) System.out.println("Invalid syntax: " + line);
+			if(res[1][0] < 0){
+				System.out.println("Invalid syntax: " + line);
+				result = false;
+			}
 			else {
 				String label = (res[0][0] < 0) ? null : line.substring(res[0][0], res[0][1] + 1);
 				String order = line.substring(res[1][0]);
@@ -224,10 +221,7 @@ public class Engine implements ActionListener {
 				addOrder(label, order, regs[15] + address);
 			}
 		}
-	}
-
-	public void run(){
-		timer.start();
+		return result;
 	}
 
 	public void step(){
@@ -277,21 +271,5 @@ public class Engine implements ActionListener {
 		if(step[3] != -1) setVar(step[3], step[4]);
 		View.Instance.updateValues(step[5], step[6], (byte) (int)step[7], (byte) (int)step[8]);
 		View.Instance.highlightLine(currentOrder+1);
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		step(); if(currentOrder >= orders.size()){
-			View.Instance.setRunning(false);
-			timer.stop();
-		}
-	}
-
-	public void setRunInterval(int interval){
-		this.interval = interval; timer.setDelay(interval);
-	}
-
-	public void pause(){
-		timer.stop();
 	}
 }

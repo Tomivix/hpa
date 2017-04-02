@@ -24,7 +24,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 
 	private FlagRegister flagRegister;
 	private ChangeableImageButton runButton;
-	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton;
+	ImageButton stepButton, backstepButton, saveButton, loadButton, buildButton, calculateButton;
 	private JSlider timeSlider;
 	private JLabel runInfoLabel;
 	public ButtonPanel(){
@@ -66,9 +66,9 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 			public void actionPerformed(ActionEvent e) {
 				View.Instance.setRunning(!View.Instance.isRunning());
 				if(View.Instance.isRunning()){
-					Engine.current.run();
+					View.Instance.run();
 				}else{
-					Engine.current.pause();
+					View.Instance.pause();
 				}
 			}
 		});
@@ -98,6 +98,13 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 				Engine.current.backStep();
 			}
 		});
+		
+		calculateButton = new ImageButton("calculate", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				View.Instance.calculate();
+			}
+		});
 
 		ImageButton helpButton = new ImageButton("help", new ActionListener() {
 
@@ -112,6 +119,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		centerPane.setLayout(new BoxLayout(centerPane, BoxLayout.PAGE_AXIS));
 		JPanel rightPane = new JPanel();
 
+		leftPane.add(helpButton);
 		leftPane.add(saveButton);
 		leftPane.add(loadButton);
 		leftPane.add(buildButton);
@@ -123,7 +131,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		rightPane.add(backstepButton);
 		rightPane.add(runButton);
 		rightPane.add(stepButton);
-		rightPane.add(helpButton);
+		rightPane.add(calculateButton);
 
 		super.add(leftPane, BorderLayout.LINE_START);
 		super.add(centerPane, BorderLayout.CENTER);
@@ -132,7 +140,7 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
-		Engine.current.setRunInterval(timeSlider.getValue());
+		View.Instance.setRunInterval(timeSlider.getValue());
 		runInfoLabel.setText("Step every " +
 				Math.round((float)timeSlider.getValue()/(float)View.SLIDER_MIN_VAL)*View.SLIDER_MIN_VAL +
 				"ms");
@@ -162,6 +170,10 @@ public class ButtonPanel extends JPanel implements ChangeListener{
 		case BACKSTEP:
 			backstepButton.setEnabled(state);
 			break;
+		case CALCULATE:
+			calculateButton.setEnabled(state);
+			break;
+			
 		}
 	}
 
